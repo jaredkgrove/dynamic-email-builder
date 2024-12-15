@@ -47,7 +47,6 @@ const Editor = () => {
       {
         replace: ParagraphNode,
         with: (node: ParagraphNode) => {
-          console.log("what");
           return new CustomParagraphNode();
         },
         withKlass: CustomParagraphNode,

@@ -1,7 +1,4 @@
 import {
-  $createParagraphNode,
-  $createTextNode,
-  $getRoot,
   createEditor,
   DecoratorNode,
   LexicalEditor,
@@ -42,13 +39,13 @@ export class EmailTextNode extends DecoratorNode<ReactNode> {
         nodes: [],
       });
 
-    this.__caption.update(() => {
-      const root = $getRoot();
-      const paragraphNode = $createParagraphNode();
-      const textNode = $createTextNode("I'm some text");
-      paragraphNode.append(textNode);
-      root.append(paragraphNode);
-    });
+    // this.__caption.update(() => {
+    //   const root = $getRoot();
+    //   const paragraphNode = $createCustomParagraphNode();
+    //   // const textNode = $createTextNode("I'm some text");
+    //   paragraphNode.append(textNode);
+    //   root.append(paragraphNode);
+    // });
   }
 
   static importJSON(serializedNode: SerializedVidoeNode): EmailTextNode {
