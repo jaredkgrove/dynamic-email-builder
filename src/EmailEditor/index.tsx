@@ -1,4 +1,10 @@
-import { EditorState, LexicalEditor } from "lexical";
+import {
+  EditorConfig,
+  EditorState,
+  LexicalEditor,
+  LexicalNode,
+  ParagraphNode,
+} from "lexical";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import {
@@ -11,6 +17,7 @@ import { EmailTextNode } from "../nodes/EmailText";
 import EmailBuilderPlugin from "../EmailBuilderPlugin";
 
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
+import { CustomParagraphNode } from "../nodes/EmailText/customParagraphNode";
 
 const theme = {
   // Theme styling goes here
@@ -34,7 +41,18 @@ const Editor = () => {
     theme,
     onError,
     editorState: undefined,
-    nodes: [EmailTextNode],
+    nodes: [
+      EmailTextNode,
+      CustomParagraphNode,
+      {
+        replace: ParagraphNode,
+        with: (node: ParagraphNode) => {
+          console.log("what");
+          return new CustomParagraphNode();
+        },
+        withKlass: CustomParagraphNode,
+      },
+    ],
   };
 
   return (

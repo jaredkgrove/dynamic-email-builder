@@ -79,7 +79,6 @@ export class EmailTextNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    console.log("decorating");
     return <EmailTextNodeComponent caption={this.__caption} />;
   }
 }

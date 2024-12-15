@@ -37,9 +37,7 @@ export default function EmailBuilderPlugin({
       <div ref={ref}></div>
       {decorators}
       <div style={{ display: "flex" }}>
-        <div onClick={addEmailTextNode}>AddEmailText</div>
-        <div onClick={addEmailTextNode}>AddEmailText</div>
-        <div onClick={addEmailTextNode}>AddEmailText</div>
+        <div onClick={addEmailTextNode}>Add Text Node</div>
       </div>
     </>
   );
