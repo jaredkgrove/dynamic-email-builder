@@ -1,6 +1,7 @@
 import {
   createEditor,
   DecoratorNode,
+  DOMExportOutput,
   LexicalEditor,
   LexicalNode,
   NodeKey,
@@ -10,7 +11,8 @@ import {
 } from "lexical";
 import { ReactNode } from "react";
 import EmailTextNodeComponent from "./EmailNodeComponent";
-
+import { $generateHtmlFromNodes } from "@lexical/html";
+import * as ReactDomServer from "react-dom/server";
 export type SerializedVidoeNode = Spread<
   {
     caption: SerializedEditor;
@@ -68,7 +70,26 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
   }
 
   createDOM(): HTMLElement {
+    //TODO: should this be a Section or something? (i don't think so, pretty sure it just uses decorate)
     return document.createElement("div");
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const lexicalHtml = this.__caption
+      .getEditorState()
+      .read(() => $generateHtmlFromNodes(this.__caption, null));
+    console.log("bleep ", lexicalHtml);
+    const uuid = "arandomstring";
+
+    //TODO should use section/row from react email
+    const outerHtml = ReactDomServer.renderToStaticMarkup(<div>{uuid}</div>);
+    let nodeHtml = outerHtml.split(uuid).join(lexicalHtml);
+    const template = document.createElement("template");
+    nodeHtml = nodeHtml.trim(); // Never return a text node of whitespace as the result
+    template.innerHTML = nodeHtml;
+    // return ; //TODO
+
+    return { element: template.content.firstElementChild as HTMLElement };
   }
 
   updateDOM(): false {

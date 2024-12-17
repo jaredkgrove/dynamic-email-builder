@@ -12,7 +12,10 @@ import EmailBuilderPlugin from "../EmailBuilderPlugin";
 
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { CustomParagraphNode } from "../nodes/emailParagraph";
-
+import { Button } from "@/components/ui/button";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import ReactDOMServer from "react-dom/server";
+import { $generateHtmlFromNodes } from "@lexical/html";
 const theme = {
   // Theme styling goes here
   //...
@@ -50,6 +53,7 @@ const Editor = () => {
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
+      <ExportHeader />
       <OnChangePlugin onChange={onChangeDebugger} />
       <EmailBuilderPlugin ErrorBoundary={LexicalErrorBoundary} />
       <HistoryPlugin />
@@ -59,3 +63,22 @@ const Editor = () => {
 };
 
 export default Editor;
+
+const ExportHeader = () => {
+  const [editor] = useLexicalComposerContext();
+  const handleClick = () => {
+    editor.update(() => {
+      // const splitUuid = "areallyrandomstring";
+
+      const lexicalHtml = $generateHtmlFromNodes(editor, null);
+      const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(lexicalHtml);
+
+      // const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
+
+      const newWindow = window.open();
+      newWindow?.document.write(emailOuterHtml);
+    });
+  };
+
+  return <Button onClick={handleClick}>Export</Button>;
+};

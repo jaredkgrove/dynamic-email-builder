@@ -36,9 +36,7 @@ export default function EmailBuilderPlugin({
   return (
     <>
       <Body>
-        <Container ref={ref} className="bloop">
-          {decorators}
-        </Container>
+        <Container ref={ref}>{decorators}</Container>
       </Body>
       <div style={{ display: "flex" }}>
         <div onClick={addEmailTextNode}>Add Text Node</div>
