@@ -1,10 +1,4 @@
-import {
-  EditorConfig,
-  EditorState,
-  LexicalEditor,
-  LexicalNode,
-  ParagraphNode,
-} from "lexical";
+import { EditorState, LexicalEditor, ParagraphNode } from "lexical";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import {
@@ -13,11 +7,11 @@ import {
 } from "@lexical/react/LexicalComposer";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { EmailTextNode } from "../nodes/EmailText";
+import { TextSectionNode } from "../nodes/TextSection";
 import EmailBuilderPlugin from "../EmailBuilderPlugin";
 
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { CustomParagraphNode } from "../nodes/EmailText/customParagraphNode";
+import { CustomParagraphNode } from "../nodes/emailParagraph";
 
 const theme = {
   // Theme styling goes here
@@ -32,7 +26,7 @@ function onError(error: Error) {
 }
 
 const onChangeDebugger = (editorState: EditorState, _editor: LexicalEditor) => {
-  console.log(JSON.parse(JSON.stringify(editorState)));
+  console.log(JSON.parse(JSON.stringify(editorState)), _editor);
 };
 
 const Editor = () => {
@@ -42,11 +36,11 @@ const Editor = () => {
     onError,
     editorState: undefined,
     nodes: [
-      EmailTextNode,
+      TextSectionNode,
       CustomParagraphNode,
       {
         replace: ParagraphNode,
-        with: (node: ParagraphNode) => {
+        with: () => {
           return new CustomParagraphNode();
         },
         withKlass: CustomParagraphNode,

@@ -1,8 +1,9 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ErrorBoundaryType, useDecorators } from "./useDecorators";
 import { $getRoot } from "lexical";
-import { $createEmailTextNode } from "../nodes/EmailText";
+import { $createEmailTextNode } from "../nodes/TextSection";
 import { useCallback } from "react";
+import { Body, Container } from "@react-email/components";
 export default function EmailBuilderPlugin({
   ErrorBoundary,
 }: {
@@ -34,8 +35,11 @@ export default function EmailBuilderPlugin({
   };
   return (
     <>
-      <div ref={ref}></div>
-      {decorators}
+      <Body>
+        <Container ref={ref} className="bloop">
+          {decorators}
+        </Container>
+      </Body>
       <div style={{ display: "flex" }}>
         <div onClick={addEmailTextNode}>Add Text Node</div>
       </div>

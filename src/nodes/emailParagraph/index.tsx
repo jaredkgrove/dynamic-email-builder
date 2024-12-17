@@ -60,9 +60,9 @@ export class CustomParagraphNode extends ParagraphNode {
   }
 
   updateDOM(
-    prevNode: CustomParagraphNode,
-    dom: HTMLElement,
-    config: EditorConfig
+    prevNode: CustomParagraphNode
+    // dom: HTMLElement,
+    // config: EditorConfig
   ): boolean {
     //TODO only true if stuff changes maybe?
     console.log(prevNode.__fontSize, this.getFontSize());
