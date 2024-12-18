@@ -1,9 +1,13 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ErrorBoundaryType, useDecorators } from "./useDecorators";
 import { $getRoot } from "lexical";
+import { $generateHtmlFromNodes } from "@lexical/html";
 import { $createEmailTextNode } from "../nodes/TextSection";
 import { useCallback } from "react";
-import { Body, Container } from "@react-email/components";
+import { Body, Container, Head, Html } from "@react-email/components";
+import { Button } from "@/components/ui/button";
+import ReactDOMServer from "react-dom/server";
+import React from "react";
 export default function EmailBuilderPlugin({
   ErrorBoundary,
 }: {
@@ -11,6 +15,21 @@ export default function EmailBuilderPlugin({
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const decorators = useDecorators(editor, ErrorBoundary);
+  const handleClick = () => {
+    editor.update(() => {
+      const splitUuid = "areallyrandomstring";
+
+      const lexicalHtml = $generateHtmlFromNodes(editor, null);
+      const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
+        <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+      );
+
+      const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
+
+      const newWindow = window.open();
+      newWindow?.document.write(finalHtml);
+    });
+  };
 
   const ref = useCallback(
     (rootElement: null | HTMLElement) => {
@@ -35,12 +54,25 @@ export default function EmailBuilderPlugin({
   };
   return (
     <>
-      <Body>
+      <Button onClick={handleClick}>Export</Button>
+      <MyCoolWrapper>
         <Container ref={ref}>{decorators}</Container>
-      </Body>
+      </MyCoolWrapper>
       <div style={{ display: "flex" }}>
         <div onClick={addEmailTextNode}>Add Text Node</div>
       </div>
     </>
   );
 }
+
+const MyCoolWrapper = React.forwardRef<
+  HTMLTableElement,
+  React.PropsWithChildren
+>((props, ref) => (
+  <Html>
+    <Head />
+    <Body>
+      <Container ref={ref}>{props.children}</Container>
+    </Body>
+  </Html>
+));

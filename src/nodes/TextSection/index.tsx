@@ -10,7 +10,7 @@ import {
   Spread,
 } from "lexical";
 import { ReactNode } from "react";
-import EmailTextNodeComponent from "./EmailNodeComponent";
+import EmailTextNodeComponent, { EmailTextWrapper } from "./EmailNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import * as ReactDomServer from "react-dom/server";
 export type SerializedVidoeNode = Spread<
@@ -78,17 +78,17 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
     const lexicalHtml = this.__caption
       .getEditorState()
       .read(() => $generateHtmlFromNodes(this.__caption, null));
-    console.log("bleep ", lexicalHtml);
     const uuid = "arandomstring";
 
     //TODO should use section/row from react email
-    const outerHtml = ReactDomServer.renderToStaticMarkup(<div>{uuid}</div>);
+    const outerHtml = ReactDomServer.renderToStaticMarkup(
+      <EmailTextWrapper>{uuid}</EmailTextWrapper>
+    );
     let nodeHtml = outerHtml.split(uuid).join(lexicalHtml);
+
     const template = document.createElement("template");
     nodeHtml = nodeHtml.trim(); // Never return a text node of whitespace as the result
-    template.innerHTML = nodeHtml;
-    // return ; //TODO
-
+    template.innerHTML = nodeHtml.trim();
     return { element: template.content.firstElementChild as HTMLElement };
   }
 
