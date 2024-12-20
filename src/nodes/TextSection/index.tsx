@@ -13,6 +13,7 @@ import { ReactNode } from "react";
 import EmailTextNodeComponent, { EmailTextWrapper } from "./EmailNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import * as ReactDomServer from "react-dom/server";
+import { randomUUID } from "crypto";
 export type SerializedVidoeNode = Spread<
   {
     caption: SerializedEditor;
@@ -78,9 +79,8 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
     const lexicalHtml = this.__caption
       .getEditorState()
       .read(() => $generateHtmlFromNodes(this.__caption, null));
-    const uuid = "arandomstring";
+    const uuid = randomUUID();
 
-    //TODO should use section/row from react email
     const outerHtml = ReactDomServer.renderToStaticMarkup(
       <EmailTextWrapper>{uuid}</EmailTextWrapper>
     );

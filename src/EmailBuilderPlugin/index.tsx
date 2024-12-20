@@ -8,6 +8,7 @@ import { Body, Container, Head, Html } from "@react-email/components";
 import { Button } from "@/components/ui/button";
 import ReactDOMServer from "react-dom/server";
 import React from "react";
+import { randomUUID } from "crypto";
 export default function EmailBuilderPlugin({
   ErrorBoundary,
 }: {
@@ -17,11 +18,16 @@ export default function EmailBuilderPlugin({
   const decorators = useDecorators(editor, ErrorBoundary);
   const handleClick = () => {
     editor.update(() => {
-      const splitUuid = "areallyrandomstring";
+      const splitUuid = randomUUID();
 
       const lexicalHtml = $generateHtmlFromNodes(editor, null);
       const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
-        <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+        <Html>
+          <Head />
+          <Body>
+            <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+          </Body>
+        </Html>
       );
 
       const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
@@ -68,11 +74,4 @@ export default function EmailBuilderPlugin({
 const MyCoolWrapper = React.forwardRef<
   HTMLTableElement,
   React.PropsWithChildren
->((props, ref) => (
-  <Html>
-    <Head />
-    <Body>
-      <Container ref={ref}>{props.children}</Container>
-    </Body>
-  </Html>
-));
+>((props, ref) => <Container ref={ref}>{props.children}</Container>);
