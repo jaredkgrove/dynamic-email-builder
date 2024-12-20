@@ -7,11 +7,10 @@ import {
 } from "@lexical/react/LexicalComposer";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { TextSectionNode } from "../nodes/TextSection";
 import EmailBuilderPlugin from "../EmailBuilderPlugin";
 
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
-import { CustomParagraphNode } from "../nodes/emailParagraph";
+import { SectionNode } from "@/nodes/Section";
 const theme = {
   // Theme styling goes here
   //...
@@ -34,17 +33,7 @@ const Editor = () => {
     theme,
     onError,
     editorState: undefined,
-    nodes: [
-      TextSectionNode,
-      CustomParagraphNode,
-      {
-        replace: ParagraphNode,
-        with: () => {
-          return new CustomParagraphNode();
-        },
-        withKlass: CustomParagraphNode,
-      },
-    ],
+    nodes: [SectionNode],
   };
 
   return (

@@ -2,11 +2,11 @@ import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { Column, Row, Section } from "@react-email/components";
-import { LexicalEditor } from "lexical";
+import { LexicalEditor, ParagraphNode } from "lexical";
 
 import { ToolbarPlugin } from "../../plugins/toolbar";
 import { ReactNode } from "react";
+import { CustomParagraphNode } from "../emailParagraph";
 
 //consider making EmailText a node that extends TextNode instead of being a decorator node. Then it gets used by lexical instead of regular TextNode
 const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
@@ -14,28 +14,36 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
     <LexicalNestedComposer
       initialEditor={caption}
       //TODO use this to limit nodes allowed. Also maybe can use to auto-replace paragraph node with Text?
-      // initialNodes={[RootNode, TextNode, LineBreakNode, CustomParagraphNode]}
+      initialNodes={[
+        CustomParagraphNode,
+        CustomParagraphNode,
+        {
+          replace: ParagraphNode,
+          with: () => {
+            return new CustomParagraphNode();
+          },
+          withKlass: CustomParagraphNode,
+        },
+      ]}
     >
       <ToolbarPlugin />
       <RichTextPlugin
         contentEditable={
-          <EmailTextWrapper>
-            <ContentEditable
-              aria-placeholder="Add some text"
-              placeholder={
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "0px",
-                    left: "0px",
-                    pointerEvents: "none",
-                  }}
-                >
-                  Add some text
-                </div>
-              }
-            />
-          </EmailTextWrapper>
+          <ContentEditable
+            aria-placeholder="Add some text"
+            placeholder={
+              <div
+                style={{
+                  position: "absolute",
+                  top: "0px",
+                  left: "0px",
+                  pointerEvents: "none",
+                }}
+              >
+                Add some text
+              </div>
+            }
+          />
         }
         ErrorBoundary={LexicalErrorBoundary}
       />
@@ -54,14 +62,3 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
 };
 
 export default EmailTextNodeComponent;
-
-export const EmailTextWrapper = ({ children }: { children: ReactNode }) => {
-  //TODO: handle fonts
-  return (
-    <Section>
-      <Row style={{ position: "relative" }}>
-        <Column>{children}</Column>
-      </Row>
-    </Section>
-  );
-};

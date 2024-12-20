@@ -10,27 +10,28 @@ import {
   Spread,
 } from "lexical";
 import { ReactNode } from "react";
-import EmailTextNodeComponent, { EmailTextWrapper } from "./EmailNodeComponent";
+import { EmailSectionWrapper } from "./SectionNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import * as ReactDomServer from "react-dom/server";
 import { v4 as uuidv4 } from "uuid";
+import EmailSectionNodeComponent from "./SectionNodeComponent";
 export type SerializedVidoeNode = Spread<
   {
     caption: SerializedEditor;
-    type: ReturnType<typeof TextSectionNode.getType>;
+    type: ReturnType<typeof SectionNode.getType>;
     version: 1;
   },
   SerializedLexicalNode
 >;
 
-export class TextSectionNode extends DecoratorNode<ReactNode> {
+export class SectionNode extends DecoratorNode<ReactNode> {
   __caption: LexicalEditor;
   static getType(): string {
-    return "EmailText";
+    return "Section";
   }
 
-  static clone(node: TextSectionNode): TextSectionNode {
-    return new TextSectionNode(node.__caption, node.__key);
+  static clone(node: SectionNode): SectionNode {
+    return new SectionNode(node.__caption, node.__key);
   }
 
   constructor(caption?: LexicalEditor, key?: NodeKey) {
@@ -41,19 +42,11 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
       createEditor({
         nodes: [],
       });
-
-    // this.__caption.update(() => {
-    //   const root = $getRoot();
-    //   const paragraphNode = $createCustomParagraphNode();
-    //   // const textNode = $createTextNode("I'm some text");
-    //   paragraphNode.append(textNode);
-    //   root.append(paragraphNode);
-    // });
   }
 
-  static importJSON(serializedNode: SerializedVidoeNode): TextSectionNode {
+  static importJSON(serializedNode: SerializedVidoeNode): SectionNode {
     const { caption } = serializedNode;
-    const node = $createEmailTextNode();
+    const node = $createSectionNode();
     const nestedEditor = node.__caption;
     const editorState = nestedEditor.parseEditorState(caption.editorState);
     if (!editorState.isEmpty()) {
@@ -65,7 +58,7 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
   exportJSON(): SerializedVidoeNode {
     return {
       caption: this.__caption.toJSON(),
-      type: TextSectionNode.getType(),
+      type: SectionNode.getType(),
       version: 1,
     };
   }
@@ -82,7 +75,7 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
     const uuid = uuidv4();
 
     const outerHtml = ReactDomServer.renderToStaticMarkup(
-      <EmailTextWrapper>{uuid}</EmailTextWrapper>
+      <EmailSectionWrapper>{uuid}</EmailSectionWrapper>
     );
     let nodeHtml = outerHtml.split(uuid).join(lexicalHtml);
 
@@ -97,16 +90,16 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    return <EmailTextNodeComponent caption={this.__caption} />;
+    return <EmailSectionNodeComponent caption={this.__caption} />;
   }
 }
 
-export function $createEmailTextNode(): TextSectionNode {
-  return new TextSectionNode();
+export function $createSectionNode(): SectionNode {
+  return new SectionNode();
 }
 
-export function $isEmailTextNode(
+export function $isSectionNode(
   node: LexicalNode | null | undefined
-): node is TextSectionNode {
-  return node instanceof TextSectionNode;
+): node is SectionNode {
+  return node instanceof SectionNode;
 }

@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ErrorBoundaryType, useDecorators } from "./useDecorators";
-import { $getRoot } from "lexical";
+import { $getRoot, $nodesOfType } from "lexical";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { $createEmailTextNode } from "../nodes/TextSection";
 import { useCallback } from "react";
@@ -8,7 +8,8 @@ import { Body, Container, Head, Html } from "@react-email/components";
 import { Button } from "@/components/ui/button";
 import ReactDOMServer from "react-dom/server";
 import React from "react";
-import { randomUUID } from "crypto";
+import { v4 as uuidv4 } from "uuid";
+import { $createSectionNode, SectionNode } from "@/nodes/Section";
 export default function EmailBuilderPlugin({
   ErrorBoundary,
 }: {
@@ -18,7 +19,7 @@ export default function EmailBuilderPlugin({
   const decorators = useDecorators(editor, ErrorBoundary);
   const handleClick = () => {
     editor.update(() => {
-      const splitUuid = randomUUID();
+      const splitUuid = uuidv4();
 
       const lexicalHtml = $generateHtmlFromNodes(editor, null);
       const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
@@ -58,14 +59,24 @@ export default function EmailBuilderPlugin({
     });
     editor.getEditorState().read(() => {});
   };
+
+  const addSectionNode = () => {
+    editor.update(() => {
+      const root = $getRoot();
+      const sectionNode = $createSectionNode();
+
+      root.append(sectionNode);
+    });
+    editor.getEditorState().read(() => {
+      console.log("what ", $nodesOfType(SectionNode));
+    });
+  };
   return (
     <>
       <Button onClick={handleClick}>Export</Button>
-      <MyCoolWrapper>
-        <Container ref={ref}>{decorators}</Container>
-      </MyCoolWrapper>
+      <MyCoolWrapper ref={ref}>{decorators}</MyCoolWrapper>
       <div style={{ display: "flex" }}>
-        <div onClick={addEmailTextNode}>Add Text Node</div>
+        <div onClick={addSectionNode}>Add Section Node</div>
       </div>
     </>
   );
