@@ -10,14 +10,15 @@ import {
   Spread,
 } from "lexical";
 import { ReactNode } from "react";
-import { EmailSectionWrapper } from "./SectionNodeComponent";
+import { EmailColumn, EmailSectionAndRow } from "./SectionNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import * as ReactDomServer from "react-dom/server";
 import { v4 as uuidv4 } from "uuid";
 import EmailSectionNodeComponent from "./SectionNodeComponent";
 export type SerializedVidoeNode = Spread<
   {
-    caption: SerializedEditor;
+    caption_1: SerializedEditor;
+    caption_2: SerializedEditor;
     type: ReturnType<typeof SectionNode.getType>;
     version: 1;
   },
@@ -25,39 +26,56 @@ export type SerializedVidoeNode = Spread<
 >;
 
 export class SectionNode extends DecoratorNode<ReactNode> {
-  __caption: LexicalEditor;
+  __caption_1: LexicalEditor;
+  __caption_2: LexicalEditor;
   static getType(): string {
     return "Section";
   }
 
   static clone(node: SectionNode): SectionNode {
-    return new SectionNode(node.__caption, node.__key);
+    return new SectionNode(node.__caption_1, node.__caption_2, node.__key);
   }
 
-  constructor(caption?: LexicalEditor, key?: NodeKey) {
+  constructor(
+    caption_1?: LexicalEditor,
+    caption_2?: LexicalEditor,
+    key?: NodeKey
+  ) {
     super(key);
 
-    this.__caption =
-      caption ||
+    this.__caption_1 =
+      caption_1 ||
+      createEditor({
+        nodes: [],
+      });
+    this.__caption_2 =
+      caption_2 ||
       createEditor({
         nodes: [],
       });
   }
 
   static importJSON(serializedNode: SerializedVidoeNode): SectionNode {
-    const { caption } = serializedNode;
+    const { caption_1, caption_2 } = serializedNode;
     const node = $createSectionNode();
-    const nestedEditor = node.__caption;
-    const editorState = nestedEditor.parseEditorState(caption.editorState);
-    if (!editorState.isEmpty()) {
-      nestedEditor.setEditorState(editorState);
+    const nestedEditor1 = node.__caption_1;
+    const editorState1 = nestedEditor1.parseEditorState(caption_1.editorState);
+    if (!editorState1.isEmpty()) {
+      nestedEditor1.setEditorState(editorState1);
+    }
+
+    const nestedEditor2 = node.__caption_2;
+    const editorState2 = nestedEditor1.parseEditorState(caption_2.editorState);
+    if (!editorState2.isEmpty()) {
+      nestedEditor2.setEditorState(editorState2);
     }
     return node;
   }
 
   exportJSON(): SerializedVidoeNode {
     return {
-      caption: this.__caption.toJSON(),
+      caption_1: this.__caption_1.toJSON(),
+      caption_2: this.__caption_2.toJSON(),
       type: SectionNode.getType(),
       version: 1,
     };
@@ -69,15 +87,23 @@ export class SectionNode extends DecoratorNode<ReactNode> {
   }
 
   exportDOM(editor: LexicalEditor): DOMExportOutput {
-    const lexicalHtml = this.__caption
+    const lexicalHtml1 = this.__caption_1
       .getEditorState()
-      .read(() => $generateHtmlFromNodes(this.__caption, null));
-    const uuid = uuidv4();
-
+      .read(() => $generateHtmlFromNodes(this.__caption_1, null));
+    const lexicalHtml2 = this.__caption_2
+      .getEditorState()
+      .read(() => $generateHtmlFromNodes(this.__caption_2, null));
+    const uuid1 = uuidv4();
+    const uuid2 = uuidv4();
     const outerHtml = ReactDomServer.renderToStaticMarkup(
-      <EmailSectionWrapper>{uuid}</EmailSectionWrapper>
+      <EmailSectionAndRow>
+        <EmailColumn>{uuid1}</EmailColumn>
+        <EmailColumn>{uuid2}</EmailColumn>
+      </EmailSectionAndRow>
     );
-    let nodeHtml = outerHtml.split(uuid).join(lexicalHtml);
+
+    let nodeHtml = outerHtml.split(uuid1).join(lexicalHtml1);
+    nodeHtml = nodeHtml.split(uuid2).join(lexicalHtml2);
 
     const template = document.createElement("template");
     nodeHtml = nodeHtml.trim(); // Never return a text node of whitespace as the result
@@ -90,7 +116,12 @@ export class SectionNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    return <EmailSectionNodeComponent caption={this.__caption} />;
+    return (
+      <EmailSectionNodeComponent
+        caption_1={this.__caption_1}
+        caption_2={this.__caption_2}
+      />
+    );
   }
 }
 
