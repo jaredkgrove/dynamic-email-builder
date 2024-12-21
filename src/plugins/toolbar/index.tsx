@@ -1,11 +1,14 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
   $getSelection,
+  BLUR_COMMAND,
   COMMAND_PRIORITY_EDITOR,
   createCommand,
+  FOCUS_COMMAND,
   LexicalCommand,
 } from "lexical";
-import { useEffect, useState } from "react";
+import { mergeRegister } from "@lexical/utils";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   $isCustomParagraphNode,
   CustomParagraphNode,
@@ -27,6 +30,49 @@ const SET_FONT_SIZE_COMMAND: LexicalCommand<number> = createCommand();
 export function ToolbarPlugin(): JSX.Element | null {
   const [typeStyle, setTypeStyle] = useState<string | undefined>();
   const [editor] = useLexicalComposerContext();
+
+  const [hasFocus, setHasFocus] = useState(() => {
+    return editor.getRootElement() === document.activeElement;
+  });
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    setHasFocus(editor.getRootElement() === document.activeElement);
+    return mergeRegister(
+      editor.registerCommand(
+        BLUR_COMMAND,
+        () => {
+          setHasFocus(false);
+          console.log({
+            ref: ref.current,
+            active: document.activeElement,
+            focus: ref.current === document.activeElement,
+          });
+          return false;
+        },
+        COMMAND_PRIORITY_EDITOR
+      ),
+      editor.registerCommand(
+        FOCUS_COMMAND,
+        () => {
+          setHasFocus(true);
+          return false;
+        },
+        COMMAND_PRIORITY_EDITOR
+      )
+      // editor.registerCommand(
+      //   SELECTION_CHANGE_COMMAND,
+      //   () => {
+      //     // setHasFocus(true);
+      //     console.log("SELECTION_CHANGE_COMMAND ");
+
+      //     return false;
+      //   },
+      //   COMMAND_PRIORITY_EDITOR
+      // )
+    );
+  }, [editor]);
 
   useEffect(() => {
     if (!editor.hasNodes([CustomParagraphNode])) {
@@ -75,6 +121,7 @@ export function ToolbarPlugin(): JSX.Element | null {
 
   const handleOpen = (open: boolean) => {
     //does this need to be in editor.read?
+    setHasFocus(true);
     if (open) {
       editor.read(() => {
         const selection = $getSelection();
@@ -107,15 +154,23 @@ export function ToolbarPlugin(): JSX.Element | null {
     }
   };
 
+  // if (!hasFocus) {
+  //   return <></>;
+  // }
+
   return (
-    <div className="border-slate-500 border-2">
+    <div className="border-slate-500 border-2 absolute top-0 -translate-y-full">
       <DropdownMenu onOpenChange={handleOpen}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
+          <Button
+            onClick={(e) => e.stopPropagation()}
+            variant="outline"
+            size="icon"
+          >
             <TypeOutline />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
+        <DropdownMenuContent ref={ref} className="w-56">
           <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuRadioGroup

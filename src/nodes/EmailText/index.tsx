@@ -10,7 +10,7 @@ import {
   Spread,
 } from "lexical";
 import { ReactNode } from "react";
-import EmailTextNodeComponent from "./EmailNodeComponent";
+import EmailTextNodeComponent from "./EmailTextNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
 export type SerializedVidoeNode = Spread<
   {

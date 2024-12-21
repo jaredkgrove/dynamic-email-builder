@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { ErrorBoundaryType, useDecorators } from "./useDecorators";
 import { $getRoot, $nodesOfType } from "lexical";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { $createEmailTextNode } from "../nodes/TextSection";
+import { $createEmailTextNode } from "../nodes/EmailText";
 import { useCallback } from "react";
 import { Body, Container, Head, Html } from "@react-email/components";
 import { Button } from "@/components/ui/button";

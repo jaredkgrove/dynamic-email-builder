@@ -5,7 +5,7 @@ import { $getRoot, $nodesOfType, LexicalEditor } from "lexical";
 
 import React, { useCallback } from "react";
 import { useDecorators } from "@/EmailBuilderPlugin/useDecorators";
-import { $createEmailTextNode, TextSectionNode } from "../TextSection";
+import { $createEmailTextNode, TextSectionNode } from "../EmailText";
 
 const EmailSectionNodeComponent = ({
   caption_1,
@@ -114,7 +114,6 @@ export const EmailSectionAndRow = React.forwardRef<
   <Section>
     <Row className="rowGuy">
       {/* allow multiple columns */}
-      {/* <Column className="columnGuy">{props.children}</Column> */}
       {props.children}
     </Row>
   </Section>
@@ -129,7 +128,8 @@ export const EmailColumn = React.forwardRef<
   HTMLTableCellElement,
   React.PropsWithChildren
 >((props) => (
-  <Column style={{ width: "50%" }} className="columnGuy">
+  //todo make sure classNames don't affect emails?
+  <Column className="relative" style={{ width: "50%" }}>
     {props.children}
   </Column>
 ));

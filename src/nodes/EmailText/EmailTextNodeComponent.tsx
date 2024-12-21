@@ -30,15 +30,9 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
         contentEditable={
           <ContentEditable
             aria-placeholder="Add some text"
+            className="outline-none"
             placeholder={
-              <div
-                style={{
-                  position: "absolute",
-                  top: "0px",
-                  left: "0px",
-                  pointerEvents: "none",
-                }}
-              >
+              <div className="absolute top-0 pointer-events-none">
                 Add some text
               </div>
             }
@@ -46,6 +40,7 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
         }
         ErrorBoundary={LexicalErrorBoundary}
       />
+
       {/* <PlainTextPlugin
         contentEditable={
           <Section>
