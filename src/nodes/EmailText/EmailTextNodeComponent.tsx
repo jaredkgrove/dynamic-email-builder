@@ -6,6 +6,7 @@ import { LexicalEditor, ParagraphNode } from "lexical";
 
 import { ToolbarPlugin } from "../../plugins/toolbar";
 import { CustomParagraphNode } from "../emailParagraph";
+import { ActiveEditorStatePlugin } from "@/plugins/activeEditorState";
 
 //consider making EmailText a node that extends TextNode instead of being a decorator node. Then it gets used by lexical instead of regular TextNode
 const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
@@ -40,6 +41,7 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
         }
         ErrorBoundary={LexicalErrorBoundary}
       />
+      <ActiveEditorStatePlugin />
 
       {/* <PlainTextPlugin
         contentEditable={

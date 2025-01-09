@@ -11,6 +11,7 @@ import EmailBuilderPlugin from "../EmailBuilderPlugin";
 
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { SectionNode } from "@/nodes/Section";
+import { EmailEditorProvider } from "./emailEditorContext";
 const theme = {
   // Theme styling goes here
   //...
@@ -37,12 +38,14 @@ const Editor = () => {
   };
 
   return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <OnChangePlugin onChange={onChangeDebugger} />
-      <EmailBuilderPlugin ErrorBoundary={LexicalErrorBoundary} />
-      <HistoryPlugin />
-      <AutoFocusPlugin />
-    </LexicalComposer>
+    <EmailEditorProvider>
+      <LexicalComposer initialConfig={initialConfig}>
+        <OnChangePlugin onChange={onChangeDebugger} />
+        <EmailBuilderPlugin ErrorBoundary={LexicalErrorBoundary} />
+        <HistoryPlugin />
+        <AutoFocusPlugin />
+      </LexicalComposer>
+    </EmailEditorProvider>
   );
 };
 
