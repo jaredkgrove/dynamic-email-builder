@@ -15,20 +15,20 @@ import { $generateHtmlFromNodes } from "@lexical/html";
 export type SerializedVidoeNode = Spread<
   {
     caption: SerializedEditor;
-    type: ReturnType<typeof TextSectionNode.getType>;
+    type: ReturnType<typeof EmailTextNode.getType>;
     version: 1;
   },
   SerializedLexicalNode
 >;
 
-export class TextSectionNode extends DecoratorNode<ReactNode> {
+export class EmailTextNode extends DecoratorNode<ReactNode> {
   __caption: LexicalEditor;
   static getType(): string {
     return "EmailText";
   }
 
-  static clone(node: TextSectionNode): TextSectionNode {
-    return new TextSectionNode(node.__caption, node.__key);
+  static clone(node: EmailTextNode): EmailTextNode {
+    return new EmailTextNode(node.__caption, node.__key);
   }
 
   constructor(caption?: LexicalEditor, key?: NodeKey) {
@@ -49,7 +49,7 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
     // });
   }
 
-  static importJSON(serializedNode: SerializedVidoeNode): TextSectionNode {
+  static importJSON(serializedNode: SerializedVidoeNode): EmailTextNode {
     const { caption } = serializedNode;
     const node = $createEmailTextNode();
     const nestedEditor = node.__caption;
@@ -63,7 +63,7 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
   exportJSON(): SerializedVidoeNode {
     return {
       caption: this.__caption.toJSON(),
-      type: TextSectionNode.getType(),
+      type: EmailTextNode.getType(),
       version: 1,
     };
   }
@@ -92,12 +92,12 @@ export class TextSectionNode extends DecoratorNode<ReactNode> {
   }
 }
 
-export function $createEmailTextNode(): TextSectionNode {
-  return new TextSectionNode();
+export function $createEmailTextNode(): EmailTextNode {
+  return new EmailTextNode();
 }
 
 export function $isEmailTextNode(
   node: LexicalNode | null | undefined
-): node is TextSectionNode {
-  return node instanceof TextSectionNode;
+): node is EmailTextNode {
+  return node instanceof EmailTextNode;
 }

@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import {
   $isCustomParagraphNode,
   CustomParagraphNode,
-} from "../../nodes/emailParagraph";
+} from "../../nodes/EmailParagraph";
 import { TypeOutline } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

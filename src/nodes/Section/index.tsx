@@ -12,13 +12,13 @@ import {
 import { ReactNode } from "react";
 import { EmailColumn, EmailSectionAndRow } from "./SectionNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import * as ReactDomServer from "react-dom/server";
+import ReactDOMServer from "react-dom/server";
 import { v4 as uuidv4 } from "uuid";
 import EmailSectionNodeComponent from "./SectionNodeComponent";
 export type SerializedVidoeNode = Spread<
   {
     caption_1: SerializedEditor;
-    caption_2: SerializedEditor;
+    caption_2?: SerializedEditor;
     type: ReturnType<typeof SectionNode.getType>;
     version: 1;
   },
@@ -27,7 +27,7 @@ export type SerializedVidoeNode = Spread<
 
 export class SectionNode extends DecoratorNode<ReactNode> {
   __caption_1: LexicalEditor;
-  __caption_2: LexicalEditor;
+  __caption_2?: LexicalEditor;
   static getType(): string {
     return "Section";
   }
@@ -48,34 +48,30 @@ export class SectionNode extends DecoratorNode<ReactNode> {
       createEditor({
         nodes: [],
       });
-    this.__caption_2 =
-      caption_2 ||
-      createEditor({
-        nodes: [],
-      });
+    this.__caption_2 = caption_2;
   }
 
   static importJSON(serializedNode: SerializedVidoeNode): SectionNode {
-    const { caption_1, caption_2 } = serializedNode;
+    //This is broke, fix it when doing serialization stuff
+    const { caption_1 } = serializedNode;
     const node = $createSectionNode();
     const nestedEditor1 = node.__caption_1;
     const editorState1 = nestedEditor1.parseEditorState(caption_1.editorState);
     if (!editorState1.isEmpty()) {
       nestedEditor1.setEditorState(editorState1);
     }
-
-    const nestedEditor2 = node.__caption_2;
-    const editorState2 = nestedEditor1.parseEditorState(caption_2.editorState);
-    if (!editorState2.isEmpty()) {
-      nestedEditor2.setEditorState(editorState2);
-    }
+    // const nestedEditor2 = node.__caption_2;
+    // const editorState2 = nestedEditor1.parseEditorState(caption_2.editorState);
+    // if (!editorState2.isEmpty()) {
+    //   nestedEditor2?.setEditorState(editorState2);
+    // }
     return node;
   }
 
   exportJSON(): SerializedVidoeNode {
     return {
       caption_1: this.__caption_1.toJSON(),
-      caption_2: this.__caption_2.toJSON(),
+      caption_2: this.__caption_2?.toJSON(),
       type: SectionNode.getType(),
       version: 1,
     };
@@ -91,16 +87,30 @@ export class SectionNode extends DecoratorNode<ReactNode> {
       .getEditorState()
       .read(() => $generateHtmlFromNodes(this.__caption_1, null));
     const lexicalHtml2 = this.__caption_2
-      .getEditorState()
-      .read(() => $generateHtmlFromNodes(this.__caption_2, null));
+      ?.getEditorState()
+      .read(() =>
+        this.__caption_2
+          ? $generateHtmlFromNodes(this.__caption_2, null)
+          : undefined
+      );
     const uuid1 = uuidv4();
     const uuid2 = uuidv4();
-    const outerHtml = ReactDomServer.renderToStaticMarkup(
-      <EmailSectionAndRow>
-        <EmailColumn>{uuid1}</EmailColumn>
-        <EmailColumn>{uuid2}</EmailColumn>
-      </EmailSectionAndRow>
-    );
+
+    let outerHtml: string;
+    if (this.__caption_2) {
+      outerHtml = ReactDOMServer.renderToStaticMarkup(
+        <EmailSectionAndRow>
+          <EmailColumn>{uuid1}</EmailColumn>
+          <EmailColumn>{uuid2}</EmailColumn>
+        </EmailSectionAndRow>
+      );
+    } else {
+      outerHtml = ReactDOMServer.renderToStaticMarkup(
+        <EmailSectionAndRow>
+          <EmailColumn>{uuid1}</EmailColumn>
+        </EmailSectionAndRow>
+      );
+    }
 
     let nodeHtml = outerHtml.split(uuid1).join(lexicalHtml1);
     nodeHtml = nodeHtml.split(uuid2).join(lexicalHtml2);
@@ -125,8 +135,22 @@ export class SectionNode extends DecoratorNode<ReactNode> {
   }
 }
 
-export function $createSectionNode(): SectionNode {
-  return new SectionNode();
+export function $createSectionNode(columnCount: 1 | 2 = 1): SectionNode {
+  if (columnCount === 2) {
+    return new SectionNode(
+      createEditor({
+        nodes: [],
+      }),
+      createEditor({
+        nodes: [],
+      })
+    );
+  }
+  return new SectionNode(
+    createEditor({
+      nodes: [],
+    })
+  );
 }
 
 export function $isSectionNode(

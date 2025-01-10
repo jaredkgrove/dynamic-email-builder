@@ -22,19 +22,16 @@ export type ErrorBoundaryType =
   | React.FC<ErrorBoundaryProps>;
 
 export function useDecorators(
-  editor: LexicalEditor,
-  ErrorBoundary: ErrorBoundaryType
+  editor?: LexicalEditor,
+  ErrorBoundary?: ErrorBoundaryType
 ): Array<JSX.Element> {
-  const [decorators, setDecorators] = useState<Record<NodeKey, JSX.Element>>(
-    () => editor.getDecorators<JSX.Element>()
-  );
+  const [decorators, setDecorators] = useState<
+    Record<NodeKey, JSX.Element> | undefined
+  >(() => editor?.getDecorators<JSX.Element>());
 
   // Subscribe to changes
   useLayoutEffect(() => {
-    console.log("prebloopregister ");
-
-    return editor.registerDecoratorListener<JSX.Element>((nextDecorators) => {
-      console.log("bloopregister ", nextDecorators);
+    return editor?.registerDecoratorListener<JSX.Element>((nextDecorators) => {
       flushSync(() => {
         setDecorators(nextDecorators);
       });
@@ -45,11 +42,14 @@ export function useDecorators(
     // If the content editable mounts before the subscription is added, then
     // nothing will be rendered on initial pass. We can get around that by
     // ensuring that we set the value.
-    setDecorators(editor.getDecorators());
+    setDecorators(editor?.getDecorators());
   }, [editor]);
 
   // Return decorators defined as React Portals
   return useMemo(() => {
+    if (!decorators || !editor || !ErrorBoundary) {
+      return [];
+    }
     const decoratedPortals = [];
     const decoratorKeys = Object.keys(decorators);
 

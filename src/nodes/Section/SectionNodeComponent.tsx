@@ -1,18 +1,20 @@
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
 import { Column, Row, Section } from "@react-email/components";
-import { $getRoot, $nodesOfType, LexicalEditor } from "lexical";
+import { $getRoot, LexicalEditor } from "lexical";
 
 import React, { useCallback } from "react";
 import { useDecorators } from "@/EmailBuilderPlugin/useDecorators";
-import { $createEmailTextNode, TextSectionNode } from "../EmailText";
+import { $createEmailTextNode, EmailTextNode } from "../EmailText";
+import { Button } from "@/components/ui/button";
+import { $createEmailImageNode, EmailImageNode } from "../EmailImage";
 
 const EmailSectionNodeComponent = ({
   caption_1,
   caption_2,
 }: {
   caption_1: LexicalEditor;
-  caption_2: LexicalEditor;
+  caption_2?: LexicalEditor;
 }) => {
   const decorators1 = useDecorators(caption_1, LexicalErrorBoundary);
   const decorators2 = useDecorators(caption_2, LexicalErrorBoundary);
@@ -32,10 +34,10 @@ const EmailSectionNodeComponent = ({
 
   const ref2 = useCallback(
     (rootElement: null | HTMLElement) => {
-      caption_2.setRootElement(rootElement);
+      caption_2?.setRootElement(rootElement);
       //Lexical adds a paragraph node when setRootElement is called.
       //I'm not sure why. There may be a better solution, but here is a hack for now
-      caption_2.update(() => {
+      caption_2?.update(() => {
         const root = $getRoot();
         root.clear();
       });
@@ -53,14 +55,34 @@ const EmailSectionNodeComponent = ({
     caption_1.getEditorState().read(() => {});
   };
 
+  const addEmailImageNode1 = () => {
+    caption_1.update(() => {
+      const root = $getRoot();
+      const emailImageNode1 = $createEmailImageNode();
+
+      root.append(emailImageNode1);
+    });
+    caption_1.getEditorState().read(() => {});
+  };
+
+  const addEmailImageNode2 = () => {
+    caption_2?.update(() => {
+      const root = $getRoot();
+      const emailImageNode2 = $createEmailImageNode();
+
+      root.append(emailImageNode2);
+    });
+    caption_2?.getEditorState().read(() => {});
+  };
+
   const addEmailTextNode2 = () => {
-    caption_2.update(() => {
+    caption_2?.update(() => {
       const root = $getRoot();
       const emailTextNode = $createEmailTextNode();
 
       root.append(emailTextNode);
     });
-    caption_2.getEditorState().read(() => {});
+    caption_2?.getEditorState().read(() => {});
   };
 
   return (
@@ -69,7 +91,7 @@ const EmailSectionNodeComponent = ({
         <EmailColumn>
           <LexicalNestedComposer
             initialEditor={caption_1}
-            initialNodes={[TextSectionNode]}
+            initialNodes={[EmailTextNode, EmailImageNode]}
           >
             {/* <ToolbarPlugin /> */}
             <div ref={ref1}> {decorators1}</div>
@@ -79,27 +101,35 @@ const EmailSectionNodeComponent = ({
           ))} */}
 
             {decorators1.length === 0 && (
-              <div onClick={addEmailTextNode1}>Add Text Node1</div>
+              <>
+                <Button onClick={addEmailTextNode1}>Text</Button>
+                <Button onClick={addEmailImageNode1}>Image</Button>
+              </>
             )}
           </LexicalNestedComposer>
         </EmailColumn>
-        <EmailColumn>
-          <LexicalNestedComposer
-            initialEditor={caption_2}
-            initialNodes={[TextSectionNode]}
-          >
-            {/* <ToolbarPlugin /> */}
-            <div ref={ref2}> {decorators2}</div>
+        {caption_2 && (
+          <EmailColumn>
+            <LexicalNestedComposer
+              initialEditor={caption_2}
+              initialNodes={[EmailTextNode, EmailImageNode]}
+            >
+              {/* <ToolbarPlugin /> */}
+              <div ref={ref2}> {decorators2}</div>
 
-            {/* {decorators.map((d, i) => (
+              {/* {decorators.map((d, i) => (
       <EmailColumn key={d.key}>{d}</EmailColumn>
     ))} */}
 
-            {decorators2.length === 0 && (
-              <div onClick={addEmailTextNode2}>Add Text Node2</div>
-            )}
-          </LexicalNestedComposer>
-        </EmailColumn>
+              {decorators2.length === 0 && (
+                <>
+                  <Button onClick={addEmailTextNode2}>Text</Button>
+                  <Button onClick={addEmailImageNode2}>Image</Button>
+                </>
+              )}
+            </LexicalNestedComposer>
+          </EmailColumn>
+        )}
       </EmailSectionAndRow>
     </>
   );

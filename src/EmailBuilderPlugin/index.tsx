@@ -1,15 +1,21 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ErrorBoundaryType, useDecorators } from "./useDecorators";
-import { $getRoot, $nodesOfType } from "lexical";
+import {
+  $getRoot,
+  COMMAND_PRIORITY_CRITICAL,
+  createCommand,
+  LexicalCommand,
+} from "lexical";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { $createEmailTextNode } from "../nodes/EmailText";
-import { useCallback } from "react";
+import { useCallback, useEffect, useLayoutEffect } from "react";
 import { Body, Container, Head, Html } from "@react-email/components";
-import { Button } from "@/components/ui/button";
 import ReactDOMServer from "react-dom/server";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { $createSectionNode, SectionNode } from "@/nodes/Section";
+import { useActiveEditors } from "@/EmailEditor/emailEditorContext";
+
+export const EXPORT_HTML_PREVIEW: LexicalCommand<null> = createCommand();
+
 export default function EmailBuilderPlugin({
   ErrorBoundary,
 }: {
@@ -17,26 +23,13 @@ export default function EmailBuilderPlugin({
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const decorators = useDecorators(editor, ErrorBoundary);
-  const handleClick = () => {
-    editor.update(() => {
-      const splitUuid = uuidv4();
+  const { parentEditor, setParentEditor } = useActiveEditors();
 
-      const lexicalHtml = $generateHtmlFromNodes(editor, null);
-      const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
-        <Html>
-          <Head />
-          <Body>
-            <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
-          </Body>
-        </Html>
-      );
-
-      const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
-
-      const newWindow = window.open();
-      newWindow?.document.write(finalHtml);
-    });
-  };
+  useEffect(() => {
+    if (!parentEditor) {
+      setParentEditor(editor);
+    }
+  }, [editor, parentEditor, setParentEditor]);
 
   const ref = useCallback(
     (rootElement: null | HTMLElement) => {
@@ -50,34 +43,38 @@ export default function EmailBuilderPlugin({
     },
     [editor]
   );
-  const addEmailTextNode = () => {
-    editor.update(() => {
-      const root = $getRoot();
-      const emailTextNode = $createEmailTextNode();
 
-      root.append(emailTextNode);
-    });
-    editor.getEditorState().read(() => {});
-  };
+  useLayoutEffect(() => {
+    return editor.registerCommand(
+      EXPORT_HTML_PREVIEW,
+      (_, editor) => {
+        editor.update(() => {
+          const splitUuid = uuidv4();
 
-  const addSectionNode = () => {
-    editor.update(() => {
-      const root = $getRoot();
-      const sectionNode = $createSectionNode();
+          const lexicalHtml = $generateHtmlFromNodes(editor, null);
+          const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
+            <Html>
+              <Head />
+              <Body>
+                <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+              </Body>
+            </Html>
+          );
 
-      root.append(sectionNode);
-    });
-    editor.getEditorState().read(() => {
-      console.log("what ", $nodesOfType(SectionNode));
-    });
-  };
+          const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
+
+          const newWindow = window.open();
+          newWindow?.document.write(finalHtml);
+        });
+        return false;
+      },
+      COMMAND_PRIORITY_CRITICAL //todo
+    );
+  }, [editor]);
+
   return (
     <>
-      <Button onClick={handleClick}>Export</Button>
       <MyCoolWrapper ref={ref}>{decorators}</MyCoolWrapper>
-      <div style={{ display: "flex" }}>
-        <div onClick={addSectionNode}>Add Section Node</div>
-      </div>
     </>
   );
 }

@@ -4,19 +4,24 @@ import { LexicalEditor } from "lexical";
 type EditorContextValue = {
   activeEditor?: LexicalEditor;
   setActiveEditor: (editor: LexicalEditor) => void;
+  parentEditor?: LexicalEditor;
+  setParentEditor: (editor: LexicalEditor) => void;
 };
 
 const EditorContext = createContext<EditorContextValue | null>(null);
 
 export const EmailEditorProvider = (props: React.PropsWithChildren) => {
   const [activeEditor, setActiveEditor] = useState<LexicalEditor>();
+  const [parentEditor, setParentEditor] = useState<LexicalEditor>();
 
   const value = useMemo(() => {
     return {
       activeEditor,
+      parentEditor,
       setActiveEditor,
+      setParentEditor,
     };
-  }, [activeEditor]);
+  }, [activeEditor, parentEditor]);
 
   return (
     <EditorContext.Provider value={value}>

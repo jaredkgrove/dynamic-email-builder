@@ -1,4 +1,4 @@
-import { EditorState, LexicalEditor, ParagraphNode } from "lexical";
+import { EditorState, LexicalEditor } from "lexical";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
 import {
@@ -12,6 +12,8 @@ import EmailBuilderPlugin from "../EmailBuilderPlugin";
 import { OnChangePlugin } from "@lexical/react/LexicalOnChangePlugin";
 import { SectionNode } from "@/nodes/Section";
 import { EmailEditorProvider } from "./emailEditorContext";
+import NodeBlocks from "./nodeBlocks";
+
 const theme = {
   // Theme styling goes here
   //...
@@ -38,14 +40,23 @@ const Editor = () => {
   };
 
   return (
-    <EmailEditorProvider>
-      <LexicalComposer initialConfig={initialConfig}>
-        <OnChangePlugin onChange={onChangeDebugger} />
-        <EmailBuilderPlugin ErrorBoundary={LexicalErrorBoundary} />
-        <HistoryPlugin />
-        <AutoFocusPlugin />
-      </LexicalComposer>
-    </EmailEditorProvider>
+    <div className="w-screen h-screen p-10 bg-slate-50">
+      <EmailEditorProvider>
+        <div className="flex w-full">
+          <div className="flex-grow border p-10">
+            <LexicalComposer initialConfig={initialConfig}>
+              <OnChangePlugin onChange={onChangeDebugger} />
+              <EmailBuilderPlugin ErrorBoundary={LexicalErrorBoundary} />
+              <HistoryPlugin />
+              <AutoFocusPlugin />
+            </LexicalComposer>
+          </div>
+          <div>
+            <NodeBlocks />
+          </div>
+        </div>
+      </EmailEditorProvider>
+    </div>
   );
 };
 
