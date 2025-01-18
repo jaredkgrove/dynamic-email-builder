@@ -41,13 +41,7 @@ export class EmailImageNode extends DecoratorNode<ReactNode> {
   }
 
   static importJSON(serializedNode: SerializedVidoeNode): EmailImageNode {
-    // const {  } = serializedNode;
     const node = $createEmailImageNode();
-    // const nestedEditor = node.__caption;
-    // const editorState = nestedEditor.parseEditorState(caption.editorState);
-    // if (!editorState.isEmpty()) {
-    //   nestedEditor.setEditorState(editorState);
-    // }
     return node;
   }
 

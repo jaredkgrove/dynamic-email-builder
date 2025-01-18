@@ -1,4 +1,5 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { mergeRegister } from "@lexical/utils";
 import { ErrorBoundaryType, useDecorators } from "./useDecorators";
 import {
   $getRoot,
@@ -15,7 +16,7 @@ import { v4 as uuidv4 } from "uuid";
 import { useActiveEditors } from "@/EmailEditor/emailEditorContext";
 
 export const EXPORT_HTML_PREVIEW: LexicalCommand<null> = createCommand();
-
+export const IMPORT_JSON: LexicalCommand<string> = createCommand();
 export default function EmailBuilderPlugin({
   ErrorBoundary,
 }: {
@@ -45,30 +46,57 @@ export default function EmailBuilderPlugin({
   );
 
   useLayoutEffect(() => {
-    return editor.registerCommand(
-      EXPORT_HTML_PREVIEW,
-      (_, editor) => {
-        editor.update(() => {
-          const splitUuid = uuidv4();
+    return mergeRegister(
+      editor.registerCommand(
+        EXPORT_HTML_PREVIEW,
+        (_, editor) => {
+          editor.update(() => {
+            const splitUuid = uuidv4();
+            // console.log("JSON ", editor.toJSON());
+            const lexicalHtml = $generateHtmlFromNodes(editor, null);
+            const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
+              <Html>
+                <Head />
+                <Body>
+                  <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+                </Body>
+              </Html>
+            );
 
-          const lexicalHtml = $generateHtmlFromNodes(editor, null);
-          const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
-            <Html>
-              <Head />
-              <Body>
-                <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
-              </Body>
-            </Html>
-          );
+            const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
 
-          const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
+            const newWindow = window.open();
+            newWindow?.document.write(finalHtml);
+          });
+          return false;
+        },
+        COMMAND_PRIORITY_CRITICAL //todo
+      )
+      // editor.registerCommand(
+      //   IMPORT_JSON,
+      //   (_, editor) => {
+      //     editor.update(() => {
+      //       const splitUuid = uuidv4();
+      //       console.log("JSON ", editor.toJSON());
+      //       const lexicalHtml = $generateHtmlFromNodes(editor, null);
+      //       const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
+      //         <Html>
+      //           <Head />
+      //           <Body>
+      //             <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+      //           </Body>
+      //         </Html>
+      //       );
 
-          const newWindow = window.open();
-          newWindow?.document.write(finalHtml);
-        });
-        return false;
-      },
-      COMMAND_PRIORITY_CRITICAL //todo
+      //       const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
+
+      //       const newWindow = window.open();
+      //       newWindow?.document.write(finalHtml);
+      //     });
+      //     return false;
+      //   },
+      //   COMMAND_PRIORITY_CRITICAL //todo
+      // )
     );
   }, [editor]);
 
