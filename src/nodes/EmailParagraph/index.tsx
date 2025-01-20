@@ -64,7 +64,7 @@ export class CustomParagraphNode extends ParagraphNode {
     // config: EditorConfig
   ): boolean {
     //TODO only true if stuff changes maybe?
-    console.log(prevNode.__fontSize, this.getFontSize());
+    // console.log(prevNode.__fontSize, this.getFontSize());
     return true;
   }
 

@@ -3,6 +3,7 @@ import {
   DOMExportOutput,
   LexicalEditor,
   LexicalNode,
+  LexicalUpdateJSON,
   NodeKey,
   SerializedLexicalNode,
   Spread,
@@ -11,7 +12,7 @@ import ReactDOMServer from "react-dom/server";
 
 import { ReactNode } from "react";
 import EmailImageNodeComponent from "./EmailImageNodeComponent";
-export type SerializedVidoeNode = Spread<
+export type SerializedEmailImageNode = Spread<
   {
     type: ReturnType<typeof EmailImageNode.getType>;
     version: 1;
@@ -40,12 +41,19 @@ export class EmailImageNode extends DecoratorNode<ReactNode> {
     // });
   }
 
-  static importJSON(serializedNode: SerializedVidoeNode): EmailImageNode {
-    const node = $createEmailImageNode();
-    return node;
+  static importJSON(serializedNode: SerializedEmailImageNode): EmailImageNode {
+    return $createEmailImageNode().updateFromJSON(serializedNode);
   }
 
-  exportJSON(): SerializedVidoeNode {
+  updateFromJSON(
+    serializedNode: LexicalUpdateJSON<SerializedEmailImageNode>
+  ): this {
+    console.log("email image node ", serializedNode);
+
+    return super.updateFromJSON(serializedNode);
+  }
+
+  exportJSON(): SerializedEmailImageNode {
     return {
       type: EmailImageNode.getType(),
       version: 1,

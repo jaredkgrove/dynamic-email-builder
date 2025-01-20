@@ -4,13 +4,13 @@ import { useEffect, useRef } from "react";
 const EmailImageNodeComponent = () => {
   const imageRef = useRef<HTMLImageElement>(null);
 
-  useEffect(() => {
-    console.log(
-      imageRef.current?.naturalHeight,
-      imageRef.current?.naturalWidth,
-      imageRef.current
-    );
-  }, []);
+  // useEffect(() => {
+  // console.log(
+  //   imageRef.current?.naturalHeight,
+  //   imageRef.current?.naturalWidth,
+  //   imageRef.current
+  // );
+  // }, []);
   return (
     <Img
       // alt="Atoms Vacuum Canister"

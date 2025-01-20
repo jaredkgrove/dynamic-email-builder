@@ -52,51 +52,36 @@ export default function EmailBuilderPlugin({
         (_, editor) => {
           editor.update(() => {
             const splitUuid = uuidv4();
-            // console.log("JSON ", editor.toJSON());
-            const lexicalHtml = $generateHtmlFromNodes(editor, null);
-            const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
-              <Html>
-                <Head />
-                <Body>
-                  <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
-                </Body>
-              </Html>
-            );
+            const editorState = editor.getEditorState();
+            console.log(JSON.stringify(editorState));
+            // const lexicalHtml = $generateHtmlFromNodes(editor, null);
+            // const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
+            //   <Html>
+            //     <Head />
+            //     <Body>
+            //       <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
+            //     </Body>
+            //   </Html>
+            // );
 
-            const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
+            // const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
 
-            const newWindow = window.open();
-            newWindow?.document.write(finalHtml);
+            // const newWindow = window.open();
+            // newWindow?.document.write(finalHtml);
           });
           return false;
         },
         COMMAND_PRIORITY_CRITICAL //todo
+      ),
+      editor.registerCommand(
+        IMPORT_JSON,
+        (editorStateStr, editor) => {
+          const editorState = editor.parseEditorState(editorStateStr);
+          editor.setEditorState(editorState);
+          return false;
+        },
+        COMMAND_PRIORITY_CRITICAL //todo
       )
-      // editor.registerCommand(
-      //   IMPORT_JSON,
-      //   (_, editor) => {
-      //     editor.update(() => {
-      //       const splitUuid = uuidv4();
-      //       console.log("JSON ", editor.toJSON());
-      //       const lexicalHtml = $generateHtmlFromNodes(editor, null);
-      //       const emailOuterHtml = ReactDOMServer.renderToStaticMarkup(
-      //         <Html>
-      //           <Head />
-      //           <Body>
-      //             <MyCoolWrapper>{splitUuid}</MyCoolWrapper>
-      //           </Body>
-      //         </Html>
-      //       );
-
-      //       const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
-
-      //       const newWindow = window.open();
-      //       newWindow?.document.write(finalHtml);
-      //     });
-      //     return false;
-      //   },
-      //   COMMAND_PRIORITY_CRITICAL //todo
-      // )
     );
   }, [editor]);
 

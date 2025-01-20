@@ -3,7 +3,7 @@ import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
 import { Column, Row, Section } from "@react-email/components";
 import { $getRoot, LexicalEditor } from "lexical";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useDecorators } from "@/EmailBuilderPlugin/useDecorators";
 import { $createEmailTextNode, EmailTextNode } from "../EmailText";
 import { Button } from "@/components/ui/button";
@@ -22,12 +22,6 @@ const EmailSectionNodeComponent = ({
   const ref1 = useCallback(
     (rootElement: null | HTMLElement) => {
       caption_1.setRootElement(rootElement);
-      //Lexical adds a paragraph node when setRootElement is called.
-      //I'm not sure why. There may be a better solution, but here is a hack for now
-      caption_1.update(() => {
-        const root = $getRoot();
-        root.clear();
-      });
     },
     [caption_1]
   );
@@ -35,12 +29,6 @@ const EmailSectionNodeComponent = ({
   const ref2 = useCallback(
     (rootElement: null | HTMLElement) => {
       caption_2?.setRootElement(rootElement);
-      //Lexical adds a paragraph node when setRootElement is called.
-      //I'm not sure why. There may be a better solution, but here is a hack for now
-      caption_2?.update(() => {
-        const root = $getRoot();
-        root.clear();
-      });
     },
     [caption_2]
   );

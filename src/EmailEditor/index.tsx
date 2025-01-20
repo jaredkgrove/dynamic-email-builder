@@ -27,7 +27,7 @@ function onError(error: Error) {
 }
 
 const onChangeDebugger = (editorState: EditorState, _editor: LexicalEditor) => {
-  console.log(JSON.parse(JSON.stringify(editorState)), _editor);
+  // console.log(JSON.parse(JSON.stringify(editorState)), _editor);
 };
 
 const Editor = () => {

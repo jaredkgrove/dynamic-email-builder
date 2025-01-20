@@ -4,6 +4,7 @@ import {
   DOMExportOutput,
   LexicalEditor,
   LexicalNode,
+  LexicalUpdateJSON,
   NodeKey,
   SerializedEditor,
   SerializedLexicalNode,
@@ -15,7 +16,9 @@ import { $generateHtmlFromNodes } from "@lexical/html";
 import ReactDOMServer from "react-dom/server";
 import { v4 as uuidv4 } from "uuid";
 import EmailSectionNodeComponent from "./SectionNodeComponent";
-export type SerializedVidoeNode = Spread<
+import { EmailTextNode } from "../EmailText";
+import { EmailImageNode } from "../EmailImage";
+export type SerializedSectionNode = Spread<
   {
     caption_1: SerializedEditor;
     caption_2?: SerializedEditor;
@@ -43,32 +46,58 @@ export class SectionNode extends DecoratorNode<ReactNode> {
   ) {
     super(key);
 
-    this.__caption_1 =
-      caption_1 ||
-      createEditor({
-        nodes: [],
-      });
+    this.__caption_1 = caption_1 || createSectionNodeEditor();
     this.__caption_2 = caption_2;
   }
 
-  static importJSON(serializedNode: SerializedVidoeNode): SectionNode {
-    //This is broke, fix it when doing serialization stuff
-    const { caption_1 } = serializedNode;
-    const node = $createSectionNode();
-    const nestedEditor1 = node.__caption_1;
-    const editorState1 = nestedEditor1.parseEditorState(caption_1.editorState);
-    if (!editorState1.isEmpty()) {
-      nestedEditor1.setEditorState(editorState1);
-    }
-    // const nestedEditor2 = node.__caption_2;
-    // const editorState2 = nestedEditor1.parseEditorState(caption_2.editorState);
-    // if (!editorState2.isEmpty()) {
-    //   nestedEditor2?.setEditorState(editorState2);
-    // }
-    return node;
+  static importJSON(serializedNode: SerializedSectionNode): SectionNode {
+    return $createSectionNode().updateFromJSON(serializedNode);
   }
 
-  exportJSON(): SerializedVidoeNode {
+  setCaption1(editor: SerializedEditor) {
+    const self = this.getWritable();
+    const editorState1 = self.__caption_1.parseEditorState(editor.editorState);
+    if (!editorState1.isEmpty()) {
+      self.__caption_1.setEditorState(editorState1);
+    }
+    return self;
+  }
+
+  getCaption1(): LexicalEditor {
+    const self = this.getLatest();
+    return self.__caption_1;
+  }
+
+  setCaption2(editor: SerializedEditor | undefined) {
+    const self = this.getWritable();
+    if (!editor) {
+      return self;
+    }
+    if (!self.__caption_2) {
+      self.__caption_2 = createSectionNodeEditor();
+    }
+    const editorState1 = self.__caption_2.parseEditorState(editor.editorState);
+    if (!editorState1.isEmpty()) {
+      self.__caption_2.setEditorState(editorState1);
+    }
+    return self;
+  }
+
+  getCaption2(): LexicalEditor | undefined {
+    const self = this.getLatest();
+    return self.__caption_2;
+  }
+
+  updateFromJSON(
+    serializedNode: LexicalUpdateJSON<SerializedSectionNode>
+  ): this {
+    return super
+      .updateFromJSON(serializedNode)
+      .setCaption1(serializedNode.caption_1)
+      .setCaption2(serializedNode.caption_2);
+  }
+
+  exportJSON(): SerializedSectionNode {
     return {
       caption_1: this.__caption_1.toJSON(),
       caption_2: this.__caption_2?.toJSON(),
@@ -135,22 +164,20 @@ export class SectionNode extends DecoratorNode<ReactNode> {
   }
 }
 
+//reuse this or nodes in SectionNodeComponent so we don't have to add new nodes in both places
+const createSectionNodeEditor = () =>
+  createEditor({
+    nodes: [EmailTextNode, EmailImageNode],
+  });
+
 export function $createSectionNode(columnCount: 1 | 2 = 1): SectionNode {
   if (columnCount === 2) {
     return new SectionNode(
-      createEditor({
-        nodes: [],
-      }),
-      createEditor({
-        nodes: [],
-      })
+      createSectionNodeEditor(),
+      createSectionNodeEditor()
     );
   }
-  return new SectionNode(
-    createEditor({
-      nodes: [],
-    })
-  );
+  return new SectionNode(createSectionNodeEditor());
 }
 
 export function $isSectionNode(

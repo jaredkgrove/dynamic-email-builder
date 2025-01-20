@@ -6,15 +6,15 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const NodeBlocks = () => {
-  const [jsonState, setJsonState] = useState<string>();
+  const [jsonStateStr, setJsonStateStr] = useState<string>();
   const { parentEditor } = useActiveEditors();
   const handleExport = () => {
     parentEditor?.dispatchCommand(EXPORT_HTML_PREVIEW, null);
   };
 
   const handleImport = () => {
-    if (jsonState) {
-      parentEditor?.dispatchCommand(IMPORT_JSON, jsonState);
+    if (jsonStateStr) {
+      parentEditor?.dispatchCommand(IMPORT_JSON, jsonStateStr);
     }
   };
   const addSectionNode = (columnCount: 1 | 2) => {
@@ -35,8 +35,8 @@ const NodeBlocks = () => {
         Double Column
       </Button>
       <textarea
-        value={jsonState}
-        onChange={(e) => setJsonState(e.target.value)}
+        value={jsonStateStr}
+        onChange={(e) => setJsonStateStr(e.target.value)}
       ></textarea>
       <Button onClick={handleImport}>Import</Button>
     </div>
