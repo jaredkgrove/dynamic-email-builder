@@ -5,6 +5,8 @@ import {
   createCommand,
   LexicalCommand,
 } from "lexical";
+import { mergeRegister } from "@lexical/utils";
+
 import { useEffect, useState } from "react";
 import {
   $isEmailParagraphNode,
@@ -22,39 +24,62 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useActiveEditors } from "@/EmailEditor/emailEditorContext";
+import { Property } from "csstype";
 
 const SET_FONT_SIZE_COMMAND: LexicalCommand<number> = createCommand();
-
+const SET_TEXT_ALIGN: LexicalCommand<Property.TextAlign> = createCommand();
 export function ToolbarPlugin(): JSX.Element | null {
   const [typeStyle, setTypeStyle] = useState<string | undefined>();
+  const [textAlign, setTextAlign] = useState<Property.TextAlign | undefined>();
   const [editor] = useLexicalComposerContext();
   const { activeEditor } = useActiveEditors();
 
   useEffect(() => {
     if (!editor.hasNodes([EmailParagraphNode])) {
       throw new Error(
-        "ToolbarPlugin: CustomParagraphNode not registered on editor (initialConfig.nodes)"
+        "ToolbarPlugin: EmailParagraphNode not registered on editor (initialConfig.nodes)"
       );
     }
 
-    return editor.registerCommand<number>(
-      SET_FONT_SIZE_COMMAND,
-      (fontSize) => {
-        const selection = $getSelection();
-        const selectedNodes = selection?.getNodes();
+    return mergeRegister(
+      editor.registerCommand<number>(
+        SET_FONT_SIZE_COMMAND,
+        (fontSize) => {
+          const selection = $getSelection();
+          const selectedNodes = selection?.getNodes();
 
-        selectedNodes?.forEach((n) => {
-          if ($isEmailParagraphNode(n)) {
-            n.setFontSize(fontSize);
-          }
-          const parent = n.getParent();
-          if ($isEmailParagraphNode(parent)) {
-            parent.setFontSize(fontSize);
-          }
-        });
-        return true;
-      },
-      COMMAND_PRIORITY_EDITOR
+          selectedNodes?.forEach((n) => {
+            if ($isEmailParagraphNode(n)) {
+              n.setFontSize(fontSize);
+            }
+            const parent = n.getParent();
+            if ($isEmailParagraphNode(parent)) {
+              parent.setFontSize(fontSize);
+            }
+          });
+          return true;
+        },
+        COMMAND_PRIORITY_EDITOR
+      ),
+      editor.registerCommand<Property.TextAlign>(
+        SET_TEXT_ALIGN,
+        (textAlign) => {
+          const selection = $getSelection();
+          const selectedNodes = selection?.getNodes();
+
+          selectedNodes?.forEach((n) => {
+            if ($isEmailParagraphNode(n)) {
+              n.setTextAlign(textAlign);
+            }
+            const parent = n.getParent();
+            if ($isEmailParagraphNode(parent)) {
+              parent.setTextAlign(textAlign);
+            }
+          });
+          return true;
+        },
+        COMMAND_PRIORITY_EDITOR
+      )
     );
   }, [editor]);
 
@@ -68,6 +93,23 @@ export function ToolbarPlugin(): JSX.Element | null {
         break;
       case "regular":
         editor.dispatchCommand(SET_FONT_SIZE_COMMAND, 12);
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const handleChangeTextAlign = (value: string) => {
+    switch (value) {
+      case "left":
+        editor.dispatchCommand(SET_TEXT_ALIGN, "left");
+        break;
+      case "center":
+        editor.dispatchCommand(SET_TEXT_ALIGN, "center");
+        break;
+      case "right":
+        editor.dispatchCommand(SET_TEXT_ALIGN, "right");
         break;
 
       default:
@@ -101,6 +143,9 @@ export function ToolbarPlugin(): JSX.Element | null {
             setTypeStyle("header_2");
           } else if (selectedParagraphNode?.getFontSize() === 12) {
             setTypeStyle("regular");
+          }
+          if (selectedParagraphNode) {
+            setTextAlign(selectedParagraphNode.getTextAlign());
           }
         } else {
           setTypeStyle(undefined);
@@ -141,6 +186,29 @@ export function ToolbarPlugin(): JSX.Element | null {
             <DropdownMenuRadioItem value="regular">
               Regular
             </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DropdownMenu onOpenChange={handleOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            onClick={(e) => e.stopPropagation()}
+            variant="outline"
+            size="icon"
+          >
+            <TypeOutline />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56">
+          <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuRadioGroup
+            value={textAlign}
+            onValueChange={handleChangeTextAlign}
+          >
+            <DropdownMenuRadioItem value="left">Left</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="center">Center</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="right">Right</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
