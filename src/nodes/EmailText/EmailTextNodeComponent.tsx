@@ -5,7 +5,7 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { LexicalEditor, ParagraphNode } from "lexical";
 
 import { ToolbarPlugin } from "../../plugins/toolbar";
-import { CustomParagraphNode } from "../EmailParagraph";
+import { EmailParagraphNode } from "../EmailParagraph";
 import { ActiveEditorStatePlugin } from "@/plugins/activeEditorState";
 
 //consider making EmailText a node that extends TextNode instead of being a decorator node. Then it gets used by lexical instead of regular TextNode
@@ -15,14 +15,14 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
       initialEditor={caption}
       //TODO use this to limit nodes allowed. Also maybe can use to auto-replace paragraph node with Text?
       initialNodes={[
-        CustomParagraphNode,
-        CustomParagraphNode,
+        EmailParagraphNode,
+        EmailParagraphNode,
         {
           replace: ParagraphNode,
           with: () => {
-            return new CustomParagraphNode();
+            return new EmailParagraphNode();
           },
-          withKlass: CustomParagraphNode,
+          withKlass: EmailParagraphNode,
         },
       ]}
     >

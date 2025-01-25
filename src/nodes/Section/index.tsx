@@ -23,7 +23,6 @@ export type SerializedSectionNode = Spread<
     caption_1: SerializedEditor;
     caption_2?: SerializedEditor;
     type: ReturnType<typeof SectionNode.getType>;
-    version: 1;
   },
   SerializedLexicalNode
 >;
@@ -99,10 +98,10 @@ export class SectionNode extends DecoratorNode<ReactNode> {
 
   exportJSON(): SerializedSectionNode {
     return {
+      ...super.exportJSON(),
       caption_1: this.__caption_1.toJSON(),
       caption_2: this.__caption_2?.toJSON(),
       type: SectionNode.getType(),
-      version: 1,
     };
   }
 

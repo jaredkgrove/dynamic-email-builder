@@ -15,7 +15,6 @@ import EmailImageNodeComponent from "./EmailImageNodeComponent";
 export type SerializedEmailImageNode = Spread<
   {
     type: ReturnType<typeof EmailImageNode.getType>;
-    version: 1;
   },
   SerializedLexicalNode
 >;
@@ -55,8 +54,8 @@ export class EmailImageNode extends DecoratorNode<ReactNode> {
 
   exportJSON(): SerializedEmailImageNode {
     return {
+      ...super.exportJSON(),
       type: EmailImageNode.getType(),
-      version: 1,
     };
   }
 

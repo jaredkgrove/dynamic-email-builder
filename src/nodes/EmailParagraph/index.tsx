@@ -1,36 +1,36 @@
 import { Text } from "@react-email/components";
 import {
   LexicalNode,
+  LexicalUpdateJSON,
   ParagraphNode,
-  SerializedLexicalNode,
+  SerializedParagraphNode,
   Spread,
 } from "lexical";
 import ReactDOMServer from "react-dom/server";
 
-export type SerializedParagraphNode = Spread<
+export type SerializedEmailParagraphNode = Spread<
   {
     fontSize: number;
-    type: ReturnType<typeof CustomParagraphNode.getType>;
-    version: 1;
+    type: ReturnType<typeof EmailParagraphNode.getType>;
   },
-  SerializedLexicalNode
+  SerializedParagraphNode
 >;
 
-export class CustomParagraphNode extends ParagraphNode {
-  __fontSize?: number;
+export class EmailParagraphNode extends ParagraphNode {
+  __fontSize: number;
   __alignText?: number;
 
   constructor(fontSize?: number, key?: string) {
     super(key);
-    this.__fontSize = fontSize;
+    this.__fontSize = fontSize || 14; //todo
   }
 
   static getType() {
-    return "custom-paragraph";
+    return "email-paragraph";
   }
 
-  static clone(node: CustomParagraphNode) {
-    return new CustomParagraphNode(node.__fontSize, node.__key);
+  static clone(node: EmailParagraphNode) {
+    return new EmailParagraphNode(node.__fontSize, node.__key);
   }
 
   createDOM() {
@@ -59,7 +59,7 @@ export class CustomParagraphNode extends ParagraphNode {
   }
 
   updateDOM(
-    prevNode: CustomParagraphNode
+    prevNode: EmailParagraphNode
     // dom: HTMLElement,
     // config: EditorConfig
   ): boolean {
@@ -71,22 +71,42 @@ export class CustomParagraphNode extends ParagraphNode {
   setFontSize(fontSize: number) {
     const self = this.getWritable();
     self.__fontSize = fontSize;
+    return self;
   }
 
-  getFontSize(): number | undefined {
+  getFontSize(): number {
     // getLatest() ensures we are getting the most
     // up-to-date value from the EditorState.
     const self = this.getLatest();
     return self.__fontSize;
   }
+  static importJSON(
+    serializedNode: SerializedEmailParagraphNode
+  ): EmailParagraphNode {
+    return $createEmailParagraphNode().updateFromJSON(serializedNode);
+  }
+
+  updateFromJSON(
+    serializedNode: LexicalUpdateJSON<SerializedEmailParagraphNode>
+  ): this {
+    const { fontSize } = serializedNode;
+    return super.updateFromJSON(serializedNode).setFontSize(fontSize);
+  }
+  exportJSON(): SerializedEmailParagraphNode {
+    return {
+      ...super.exportJSON(),
+      fontSize: this.getFontSize(),
+      type: this.getType(),
+    };
+  }
 }
 
-export function $createCustomParagraphNode(): CustomParagraphNode {
-  return new CustomParagraphNode();
+export function $createEmailParagraphNode(): EmailParagraphNode {
+  return new EmailParagraphNode();
 }
 
-export function $isCustomParagraphNode(
+export function $isEmailParagraphNode(
   node: LexicalNode | null | undefined
-): node is CustomParagraphNode {
-  return node instanceof CustomParagraphNode;
+): node is EmailParagraphNode {
+  return node instanceof EmailParagraphNode;
 }

@@ -12,15 +12,19 @@ import {
 import { ReactNode } from "react";
 import EmailTextNodeComponent from "./EmailTextNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
-export type SerializedVidoeNode = Spread<
+import { EmailParagraphNode } from "../EmailParagraph";
+export type SerializedEmailTextNode = Spread<
   {
     caption: SerializedEditor;
     type: ReturnType<typeof EmailTextNode.getType>;
-    version: 1;
   },
   SerializedLexicalNode
 >;
-
+//reuse this or nodes in SectionNodeComponent so we don't have to add new nodes in both places
+const createEmailTextNodeEditor = () =>
+  createEditor({
+    nodes: [EmailParagraphNode],
+  });
 export class EmailTextNode extends DecoratorNode<ReactNode> {
   __caption: LexicalEditor;
   static getType(): string {
@@ -34,11 +38,7 @@ export class EmailTextNode extends DecoratorNode<ReactNode> {
   constructor(caption?: LexicalEditor, key?: NodeKey) {
     super(key);
 
-    this.__caption =
-      caption ||
-      createEditor({
-        nodes: [],
-      });
+    this.__caption = caption || createEmailTextNodeEditor();
 
     // this.__caption.update(() => {
     //   const root = $getRoot();
@@ -49,22 +49,23 @@ export class EmailTextNode extends DecoratorNode<ReactNode> {
     // });
   }
 
-  static importJSON(serializedNode: SerializedVidoeNode): EmailTextNode {
+  static importJSON(serializedNode: SerializedEmailTextNode): EmailTextNode {
     const { caption } = serializedNode;
     const node = $createEmailTextNode();
     const nestedEditor = node.__caption;
     const editorState = nestedEditor.parseEditorState(caption.editorState);
+    console.log({ editorState });
     if (!editorState.isEmpty()) {
       nestedEditor.setEditorState(editorState);
     }
     return node;
   }
 
-  exportJSON(): SerializedVidoeNode {
+  exportJSON(): SerializedEmailTextNode {
     return {
+      ...super.exportJSON(),
       caption: this.__caption.toJSON(),
       type: EmailTextNode.getType(),
-      version: 1,
     };
   }
 

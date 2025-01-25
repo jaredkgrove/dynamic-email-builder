@@ -7,8 +7,8 @@ import {
 } from "lexical";
 import { useEffect, useState } from "react";
 import {
-  $isCustomParagraphNode,
-  CustomParagraphNode,
+  $isEmailParagraphNode,
+  EmailParagraphNode,
 } from "../../nodes/EmailParagraph";
 import { TypeOutline } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ export function ToolbarPlugin(): JSX.Element | null {
   const { activeEditor } = useActiveEditors();
 
   useEffect(() => {
-    if (!editor.hasNodes([CustomParagraphNode])) {
+    if (!editor.hasNodes([EmailParagraphNode])) {
       throw new Error(
         "ToolbarPlugin: CustomParagraphNode not registered on editor (initialConfig.nodes)"
       );
@@ -44,11 +44,11 @@ export function ToolbarPlugin(): JSX.Element | null {
         const selectedNodes = selection?.getNodes();
 
         selectedNodes?.forEach((n) => {
-          if ($isCustomParagraphNode(n)) {
+          if ($isEmailParagraphNode(n)) {
             n.setFontSize(fontSize);
           }
           const parent = n.getParent();
-          if ($isCustomParagraphNode(parent)) {
+          if ($isEmailParagraphNode(parent)) {
             parent.setFontSize(fontSize);
           }
         });
@@ -83,11 +83,11 @@ export function ToolbarPlugin(): JSX.Element | null {
         const selectedNodes = selection?.getNodes();
         const selectedCustomParagraphNodes = selectedNodes
           ?.map((n) => {
-            if ($isCustomParagraphNode(n)) {
+            if ($isEmailParagraphNode(n)) {
               return n;
             }
             const parent = n.getParent();
-            if ($isCustomParagraphNode(parent)) {
+            if ($isEmailParagraphNode(parent)) {
               return parent;
             }
             return null;
