@@ -13,7 +13,7 @@ import { Body, Container, Head, Html } from "@react-email/components";
 import ReactDOMServer from "react-dom/server";
 import React from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useActiveEditors } from "@/EmailEditor/emailEditorContext";
+import { useEmailEditor } from "@/EmailEditor/emailEditorContext";
 
 export const EXPORT_HTML_PREVIEW: LexicalCommand<null> = createCommand();
 export const IMPORT_JSON: LexicalCommand<string> = createCommand();
@@ -24,7 +24,7 @@ export default function EmailBuilderPlugin({
 }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const decorators = useDecorators(editor, ErrorBoundary);
-  const { parentEditor, setParentEditor } = useActiveEditors();
+  const { parentEditor, setParentEditor } = useEmailEditor();
 
   useEffect(() => {
     if (!parentEditor) {

@@ -23,7 +23,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useActiveEditors } from "@/EmailEditor/emailEditorContext";
+import { useEmailEditor } from "@/EmailEditor/emailEditorContext";
 import { Property } from "csstype";
 
 const SET_FONT_SIZE_COMMAND: LexicalCommand<number> = createCommand();
@@ -32,7 +32,7 @@ export function ToolbarPlugin(): JSX.Element | null {
   const [typeStyle, setTypeStyle] = useState<string | undefined>();
   const [textAlign, setTextAlign] = useState<Property.TextAlign | undefined>();
   const [editor] = useLexicalComposerContext();
-  const { activeEditor } = useActiveEditors();
+  const { activeEditor } = useEmailEditor();
 
   useEffect(() => {
     if (!editor.hasNodes([EmailParagraphNode])) {

@@ -1,9 +1,11 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { LexicalEditor } from "lexical";
+import { LexicalEditor, LexicalNode } from "lexical";
 
 type EditorContextValue = {
   activeEditor?: LexicalEditor;
+  activeNode?: LexicalNode;
   setActiveEditor: (editor: LexicalEditor) => void;
+  setActiveNode: (node: LexicalNode) => void;
   parentEditor?: LexicalEditor;
   setParentEditor: (editor: LexicalEditor) => void;
 };
@@ -13,15 +15,18 @@ const EditorContext = createContext<EditorContextValue | null>(null);
 export const EmailEditorProvider = (props: React.PropsWithChildren) => {
   const [activeEditor, setActiveEditor] = useState<LexicalEditor>();
   const [parentEditor, setParentEditor] = useState<LexicalEditor>();
+  const [activeNode, setActiveNode] = useState<LexicalNode>();
 
   const value = useMemo(() => {
     return {
       activeEditor,
+      activeNode,
       parentEditor,
       setActiveEditor,
+      setActiveNode,
       setParentEditor,
     };
-  }, [activeEditor, parentEditor]);
+  }, [activeEditor, activeNode, parentEditor]);
 
   return (
     <EditorContext.Provider value={value}>
@@ -30,7 +35,7 @@ export const EmailEditorProvider = (props: React.PropsWithChildren) => {
   );
 };
 
-export const useActiveEditors = (): EditorContextValue => {
+export const useEmailEditor = (): EditorContextValue => {
   const context = useContext(EditorContext);
   if (context === null) {
     throw new Error(

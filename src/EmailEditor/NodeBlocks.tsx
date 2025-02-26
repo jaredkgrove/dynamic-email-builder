@@ -1,5 +1,5 @@
 import { $getRoot } from "lexical";
-import { useActiveEditors } from "./emailEditorContext";
+import { useEmailEditor } from "./emailEditorContext";
 import { $createSectionNode } from "@/nodes/Section";
 import { EXPORT_HTML_PREVIEW, IMPORT_JSON } from "@/EmailBuilderPlugin";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const NodeBlocks = () => {
   const [jsonStateStr, setJsonStateStr] = useState<string>();
-  const { parentEditor } = useActiveEditors();
+  const { parentEditor } = useEmailEditor();
   const handleExport = () => {
     parentEditor?.dispatchCommand(EXPORT_HTML_PREVIEW, null);
   };
