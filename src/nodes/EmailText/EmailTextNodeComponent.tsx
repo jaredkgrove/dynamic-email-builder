@@ -16,7 +16,6 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
       //TODO use this to limit nodes allowed. Also maybe can use to auto-replace paragraph node with Text?
       initialNodes={[
         EmailParagraphNode,
-        EmailParagraphNode,
         {
           replace: ParagraphNode,
           with: () => {

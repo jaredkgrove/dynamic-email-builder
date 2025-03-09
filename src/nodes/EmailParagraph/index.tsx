@@ -1,5 +1,6 @@
 import { Text } from "@react-email/components";
 import {
+  Klass,
   LexicalNode,
   LexicalUpdateJSON,
   ParagraphNode,
@@ -7,7 +8,6 @@ import {
   Spread,
 } from "lexical";
 import ReactDOMServer from "react-dom/server";
-import { Property } from "csstype";
 
 export type SerializedEmailParagraphNode = Spread<
   {
@@ -117,3 +117,29 @@ export function $isEmailParagraphNode(
 ): node is EmailParagraphNode {
   return node instanceof EmailParagraphNode;
 }
+
+export function patchStyleTransformation(
+  LexicalNode: Klass<EmailParagraphNode>
+) {
+  const originalExportDOM = LexicalNode.prototype.exportDOM;
+  LexicalNode.prototype.exportDOM = function exportDOM(editor) {
+    console.log("bleeeeep");
+    const result = originalExportDOM.apply(this, [editor]);
+    const element = result.element;
+    if (element) {
+      // const formatType = this.getFormatType();
+      element.style.textAlign = "right"; //TODO
+
+      const direction = this.getDirection();
+      if (direction) {
+        element.dir = direction;
+      }
+      const indent = this.getIndent();
+      if (indent > 0) {
+        element.style.textIndent = `${indent * 20}px`;
+      }
+    }
+    return result;
+  };
+}
+patchStyleTransformation(EmailParagraphNode);
