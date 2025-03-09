@@ -66,6 +66,7 @@ export default function EmailBuilderPlugin({
 
             const finalHtml = emailOuterHtml.split(splitUuid).join(lexicalHtml);
 
+            //TODO don't use document.write
             const newWindow = window.open();
             newWindow?.document.write(finalHtml);
           });

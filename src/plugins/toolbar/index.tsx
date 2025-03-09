@@ -1,5 +1,6 @@
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import {
+  $getRoot,
   $getSelection,
   COMMAND_PRIORITY_EDITOR,
   createCommand,
@@ -8,10 +9,7 @@ import {
 import { mergeRegister } from "@lexical/utils";
 
 import { useEffect, useState } from "react";
-import {
-  $isEmailParagraphNode,
-  EmailParagraphNode,
-} from "../../nodes/EmailParagraph";
+import { $isEmailParagraphNode } from "../../nodes/EmailParagraph";
 import { TypeOutline } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,22 +22,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEmailEditor } from "@/EmailEditor/emailEditorContext";
-import { Property } from "csstype";
+import { $isEmailTextNode } from "@/nodes/EmailText";
+import { $isEmailImageNode } from "@/nodes/EmailImage";
 
 const SET_FONT_SIZE_COMMAND: LexicalCommand<number> = createCommand();
-const SET_TEXT_ALIGN: LexicalCommand<Property.TextAlign> = createCommand();
+const SET_TEXT_ALIGN: LexicalCommand<"center" | "left" | "right"> =
+  createCommand();
 export function ToolbarPlugin(): JSX.Element | null {
   const [typeStyle, setTypeStyle] = useState<string | undefined>();
-  const [textAlign, setTextAlign] = useState<Property.TextAlign | undefined>();
+  const [textAlign, setTextAlign] = useState<
+    "center" | "left" | "right" | undefined
+  >();
   const [editor] = useLexicalComposerContext();
-  const { activeEditor } = useEmailEditor();
+  const { activeEditor, activeColumn } = useEmailEditor();
 
   useEffect(() => {
-    if (!editor.hasNodes([EmailParagraphNode])) {
-      throw new Error(
-        "ToolbarPlugin: EmailParagraphNode not registered on editor (initialConfig.nodes)"
-      );
-    }
+    // if (!editor.hasNodes([EmailParagraphNode])) {
+    //   throw new Error(
+    //     "ToolbarPlugin: EmailParagraphNode not registered on editor (initialConfig.nodes)"
+    //   );
+    // }
 
     return mergeRegister(
       editor.registerCommand<number>(
@@ -60,28 +62,37 @@ export function ToolbarPlugin(): JSX.Element | null {
           return true;
         },
         COMMAND_PRIORITY_EDITOR
-      ),
-      editor.registerCommand<Property.TextAlign>(
+      )
+    );
+  }, [activeColumn, editor]);
+  useEffect(() => {
+    // if (!editor.hasNodes([EmailParagraphNode])) {
+    //   throw new Error(
+    //     "ToolbarPlugin: EmailParagraphNode not registered on editor (initialConfig.nodes)"
+    //   );
+    // }
+    if (!activeColumn) {
+      return;
+    }
+    return mergeRegister(
+      activeColumn.registerCommand<"center" | "left" | "right">(
         SET_TEXT_ALIGN,
         (textAlign) => {
-          const selection = $getSelection();
-          const selectedNodes = selection?.getNodes();
+          const root = $getRoot();
+          const nodes = root.getChildren();
 
-          selectedNodes?.forEach((n) => {
-            if ($isEmailParagraphNode(n)) {
-              n.setTextAlign(textAlign);
-            }
-            const parent = n.getParent();
-            if ($isEmailParagraphNode(parent)) {
-              parent.setTextAlign(textAlign);
+          nodes.forEach((node) => {
+            if ($isEmailTextNode(node) || $isEmailImageNode(node)) {
+              node.setTextAlign(textAlign);
             }
           });
+
           return true;
         },
         COMMAND_PRIORITY_EDITOR
       )
     );
-  }, [editor]);
+  }, [activeColumn]);
 
   const handleChangeFontSize = (value: string) => {
     switch (value) {
@@ -103,13 +114,13 @@ export function ToolbarPlugin(): JSX.Element | null {
   const handleChangeTextAlign = (value: string) => {
     switch (value) {
       case "left":
-        editor.dispatchCommand(SET_TEXT_ALIGN, "left");
+        activeColumn?.dispatchCommand(SET_TEXT_ALIGN, "left");
         break;
       case "center":
-        editor.dispatchCommand(SET_TEXT_ALIGN, "center");
+        activeColumn?.dispatchCommand(SET_TEXT_ALIGN, "center");
         break;
       case "right":
-        editor.dispatchCommand(SET_TEXT_ALIGN, "right");
+        activeColumn?.dispatchCommand(SET_TEXT_ALIGN, "right");
         break;
 
       default:
@@ -144,9 +155,9 @@ export function ToolbarPlugin(): JSX.Element | null {
           } else if (selectedParagraphNode?.getFontSize() === 12) {
             setTypeStyle("regular");
           }
-          if (selectedParagraphNode) {
-            setTextAlign(selectedParagraphNode.getTextAlign());
-          }
+          // if (selectedParagraphNode) {
+          //   setTextAlign(selectedParagraphNode.getTextAlign());
+          // }
         } else {
           setTypeStyle(undefined);
         }

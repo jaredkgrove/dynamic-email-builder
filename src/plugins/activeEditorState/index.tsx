@@ -5,18 +5,19 @@ import { useEmailEditor } from "@/EmailEditor/emailEditorContext";
 
 export function ActiveEditorStatePlugin() {
   const [editor] = useLexicalComposerContext();
-  const { setActiveEditor } = useEmailEditor();
+  const { setActiveColumn, setActiveEditor } = useEmailEditor();
 
   useEffect(() => {
     return editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
       (_, activeEditor) => {
         setActiveEditor(activeEditor);
+        setActiveColumn(editor);
         return false;
       },
       COMMAND_PRIORITY_CRITICAL
     );
-  }, [editor, setActiveEditor]);
+  }, [editor, setActiveColumn, setActiveEditor]);
 
   return null;
 }

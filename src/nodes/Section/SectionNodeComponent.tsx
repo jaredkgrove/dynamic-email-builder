@@ -8,6 +8,8 @@ import { useDecorators } from "@/EmailBuilderPlugin/useDecorators";
 import { $createEmailTextNode, EmailTextNode } from "../EmailText";
 import { Button } from "@/components/ui/button";
 import { $createEmailImageNode, EmailImageNode } from "../EmailImage";
+import { ActiveEditorStatePlugin } from "@/plugins/activeEditorState";
+import { ToolbarPlugin } from "@/plugins/toolbar";
 
 const EmailSectionNodeComponent = ({
   caption_1,
@@ -81,6 +83,8 @@ const EmailSectionNodeComponent = ({
             initialEditor={caption_1}
             initialNodes={[EmailTextNode, EmailImageNode]}
           >
+            <ToolbarPlugin />
+            <ActiveEditorStatePlugin />
             {/* <ToolbarPlugin /> */}
             <div ref={ref1}> {decorators1}</div>
 
@@ -102,7 +106,8 @@ const EmailSectionNodeComponent = ({
               initialEditor={caption_2}
               initialNodes={[EmailTextNode, EmailImageNode]}
             >
-              {/* <ToolbarPlugin /> */}
+              <ActiveEditorStatePlugin />
+
               <div ref={ref2}> {decorators2}</div>
 
               {/* {decorators.map((d, i) => (

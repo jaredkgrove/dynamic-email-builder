@@ -26,7 +26,6 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
         },
       ]}
     >
-      <ToolbarPlugin />
       <RichTextPlugin
         contentEditable={
           <ContentEditable
@@ -41,8 +40,8 @@ const EmailTextNodeComponent = ({ caption }: { caption: LexicalEditor }) => {
         }
         ErrorBoundary={LexicalErrorBoundary}
       />
-      <ActiveEditorStatePlugin />
-
+      {/* ActiveEditorStatePlugin moved up to section node component  */}
+      {/* <ActiveEditorStatePlugin /> */}
       {/* <PlainTextPlugin
         contentEditable={
           <Section>
