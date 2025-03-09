@@ -13,6 +13,7 @@ import { ReactNode } from "react";
 import EmailTextNodeComponent from "./EmailTextNodeComponent";
 import { $generateHtmlFromNodes } from "@lexical/html";
 import { EmailParagraphNode } from "../EmailParagraph";
+import Selectable from "@/components/SelectableNodeComponent";
 export type SerializedEmailTextNode = Spread<
   {
     caption: SerializedEditor;
@@ -74,7 +75,7 @@ export class EmailTextNode extends DecoratorNode<ReactNode> {
     return document.createElement("div");
   }
 
-  exportDOM(editor: LexicalEditor): DOMExportOutput {
+  exportDOM(): DOMExportOutput {
     const lexicalHtml = this.__caption
       .getEditorState()
       .read(() => $generateHtmlFromNodes(this.__caption, null));
@@ -89,7 +90,11 @@ export class EmailTextNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    return <EmailTextNodeComponent caption={this.__caption} />;
+    return (
+      <Selectable node={this}>
+        <EmailTextNodeComponent caption={this.__caption} />
+      </Selectable>
+    );
   }
 }
 

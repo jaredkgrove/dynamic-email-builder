@@ -28,7 +28,7 @@ export class EmailParagraphNode extends ParagraphNode {
   constructor(fontSize?: number, textAlign?: Property.TextAlign, key?: string) {
     super(key);
     this.__fontSize = fontSize || DEFAULT_FONT_SIZE; //todo
-    this.__textAlign = textAlign || DEFAULT_TEXT_ALIGN; //todo
+    this.__textAlign = textAlign || DEFAULT_TEXT_ALIGN; //todo text align seems to get stripped, move this to SectionNode or maybe stop caring about html warnings
   }
 
   static getType() {
@@ -75,11 +75,10 @@ export class EmailParagraphNode extends ParagraphNode {
     // return p;
   }
 
-  updateDOM(
-    prevNode: EmailParagraphNode
-    // dom: HTMLElement,
-    // config: EditorConfig
-  ): boolean {
+  updateDOM(): // prevNode: EmailParagraphNode
+  // dom: HTMLElement,
+  // config: EditorConfig
+  boolean {
     //TODO only true if stuff changes maybe?
     // console.log(prevNode.__fontSize, this.getFontSize());
     return true;

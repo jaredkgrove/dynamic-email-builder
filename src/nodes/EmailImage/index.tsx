@@ -11,9 +11,8 @@ import {
 import ReactDOMServer from "react-dom/server";
 
 import { ReactNode } from "react";
-import EmailImageNodeComponent, {
-  EmailImageComponent,
-} from "./EmailImageNodeComponent";
+import EmailImageNodeComponent from "./EmailImageNodeComponent";
+import Selectable from "@/components/SelectableNodeComponent";
 export type SerializedEmailImageNode = Spread<
   {
     type: ReturnType<typeof EmailImageNode.getType>;
@@ -68,7 +67,7 @@ export class EmailImageNode extends DecoratorNode<ReactNode> {
 
   exportDOM(editor: LexicalEditor): DOMExportOutput {
     const lexicalHtml = ReactDOMServer.renderToStaticMarkup(
-      <EmailImageComponent />
+      <EmailImageNodeComponent />
     );
     const template = document.createElement("template");
     const nodeHtml = lexicalHtml.trim(); // Never return a text node of whitespace as the result
@@ -81,7 +80,11 @@ export class EmailImageNode extends DecoratorNode<ReactNode> {
   }
 
   decorate(): ReactNode {
-    return <EmailImageNodeComponent node={this} />;
+    return (
+      <Selectable node={this}>
+        <EmailImageNodeComponent />
+      </Selectable>
+    );
   }
 }
 

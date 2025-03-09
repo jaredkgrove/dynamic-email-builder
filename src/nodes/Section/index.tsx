@@ -110,7 +110,7 @@ export class SectionNode extends DecoratorNode<ReactNode> {
     return document.createElement("div");
   }
 
-  exportDOM(editor: LexicalEditor): DOMExportOutput {
+  exportDOM(): DOMExportOutput {
     const lexicalHtml1 = this.__caption_1
       .getEditorState()
       .read(() => $generateHtmlFromNodes(this.__caption_1, null));

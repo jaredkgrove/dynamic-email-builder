@@ -3,7 +3,7 @@ import { LexicalNestedComposer } from "@lexical/react/LexicalNestedComposer";
 import { Column, Row, Section } from "@react-email/components";
 import { $getRoot, LexicalEditor } from "lexical";
 
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback } from "react";
 import { useDecorators } from "@/EmailBuilderPlugin/useDecorators";
 import { $createEmailTextNode, EmailTextNode } from "../EmailText";
 import { Button } from "@/components/ui/button";
