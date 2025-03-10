@@ -83,6 +83,7 @@ const EmailSectionNodeComponent = ({
             initialEditor={caption_1}
             initialNodes={[EmailTextNode, EmailImageNode]}
           >
+            {/* make this a sidebar plugin or something and have text specific toolbar? */}
             <ToolbarPlugin />
             <ActiveEditorStatePlugin />
             {/* <ToolbarPlugin /> */}

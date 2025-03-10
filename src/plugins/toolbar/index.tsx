@@ -25,7 +25,7 @@ import { useEmailEditor } from "@/EmailEditor/emailEditorContext";
 import { $isEmailTextNode } from "@/nodes/EmailText";
 import { $isEmailImageNode } from "@/nodes/EmailImage";
 
-const SET_FONT_SIZE_COMMAND: LexicalCommand<number> = createCommand();
+export const SET_FONT_SIZE_COMMAND: LexicalCommand<number> = createCommand();
 const SET_TEXT_ALIGN: LexicalCommand<"center" | "left" | "right"> =
   createCommand();
 export function ToolbarPlugin(): JSX.Element | null {
